@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="colorPrimary">#A8DADC</color>
+    <color name="colorPrimaryVariant">#72BFA1</color>
+    <color name="colorOnPrimary">#1D3557</color>
+
+    <!-- Secondary Colors for Dark Mode -->
+    <color name="colorSecondary">#457B9D</color>
+    <color name="colorSecondaryVariant">#102A43</color>
+    <color name="colorOnSecondary">#F1FAEE</color>
+
+    <!-- Background and Surface for Dark Mode -->
+    <color name="colorBackground">#1D3557</color>
+    <color name="colorOnBackground">#F1FAEE</color>
+    <color name="colorSurface">#102A43</color>
+    <color name="colorOnSurface">#A8DADC</color>
+
+    <!-- Error Colors -->
+    <color name="colorError">#E63946</color>
+    <color name="colorOnError">#FFFFFF</color>
+</resources>

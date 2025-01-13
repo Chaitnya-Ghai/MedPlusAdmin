@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph.xml"
+    app:startDestination="@id/manageUsersFragment">
+    <fragment
+        android:id="@+id/manageUsersFragment"
+        android:name="com.example.medplusadmin.fragments.ManageUsersFragment"
+        android:label="Active Users"
+        tools:layout="@layout/fragment_manage_users" >
+        <action
+            android:id="@+id/action_manageUsersFragment2_to_categoriesFragment"
+            app:destination="@id/categoriesFragment" />
+        <action
+            android:id="@+id/action_manageUsersFragment2_to_medicinesFragment"
+            app:destination="@id/medicinesFragment" />
+        <action
+            android:id="@+id/action_manageUsersFragment2_to_dashboardFragment"
+            app:destination="@id/dashboardFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/categoriesFragment"
+        android:name="com.example.medplusadmin.fragments.CategoriesFragment"
+        android:label="Categories"
+        tools:layout="@layout/fragment_categories" >
+        <action
+            android:id="@+id/action_categoriesFragment_to_medicinesFragment"
+            app:destination="@id/medicinesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/medicinesFragment"
+        android:name="com.example.medplusadmin.fragments.MedicinesFragment"
+        android:label="Medicines"
+        tools:layout="@layout/fragment_medicines" />
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="com.example.medplusadmin.fragments.DashboardFragment"
+        android:label="Dashboard"
+        tools:layout="@layout/fragment_dashboard" />
+</navigation>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android = "http://schemas.android.com/apk/res/android"
+    xmlns:tools = "http://schemas.android.com/tools"
+    tools:showIn = "navigation_view">
+    <group android:checkableBehavior = "single">
+        <item
+            android:id = "@+id/home"
+            android:title = "Home"
+            android:icon="@drawable/homeicon"/>
+        <item
+            android:id = "@+id/catNavItem"
+            android:title = "Categories"
+            android:icon="@drawable/categoryicon"/>
+        <item
+            android:id = "@+id/mediNavItem"
+            android:title = "Medicines"
+            android:icon="@drawable/medicineicon"/>
+        <item
+            android:id = "@+id/dashNavItem"
+            android:title = "Dashboard"
+            android:icon="@drawable/dashboardicon"/>
+        <item android:title="About Us ">
+            <menu>
+                <item
+                    android:id = "@+id/support"
+                    android:title = "Support  &amp;  Help"
+                    android:icon="@drawable/help"/>
+            </menu>
+        </item>
+    </group>
+</menu>

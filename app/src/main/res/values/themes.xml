@@ -1,0 +1,41 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.MedPlusAdmin" parent="Theme.Material3.DayNight">
+        <!-- Customize your light theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+
+        <!-- Secondary Colors -->
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorSecondaryVariant">@color/colorSecondaryVariant</item>
+        <item name="colorOnSecondary">@color/colorOnSecondary</item>
+
+        <!-- Background and Surface -->
+        <item name="colorOnBackground">@color/colorOnBackground</item>
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnSurface">@color/colorOnSurface</item>
+
+        <!-- Error Colors -->
+        <item name="colorError">@color/colorError</item>
+        <item name="colorOnError">@color/colorOnError</item>
+    </style>
+
+
+    <!-- Customize fonts here. -->
+    <style name="CustomHighBold">
+        <item name="android:fontFamily">@font/highbold</item>
+    </style>
+    <style name="CustomMedium">
+        <item name="android:fontFamily">@font/medium</item>
+    </style>
+    <style name="CustomLight">
+        <item name="android:fontFamily">@font/light</item>
+    </style>
+    <style name="CustomRegular">
+        <item name="android:fontFamily">@font/regular</item>
+    </style>
+
+
+    <style name="Theme.MedPlusAdmin" parent="Base.Theme.MedPlusAdmin" />
+</resources>
