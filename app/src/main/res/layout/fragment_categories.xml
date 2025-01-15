@@ -27,6 +27,7 @@
             android:layout_height="wrap_content"
             android:text="Categories"
             style="@style/CustomHighBold"
+            android:layout_marginHorizontal="@dimen/_20sp"
             android:textSize="45dp" />
         <SearchView
             android:layout_width="match_parent"

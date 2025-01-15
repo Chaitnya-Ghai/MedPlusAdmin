@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -17,8 +18,8 @@ import com.example.medplusadmin.interfaces.ClickType
 class CategoryAdapter(var context: Context, var list: MutableList<CategoryModel>, var categoryInterface: CategoryInterface ):RecyclerView.Adapter<CategoryAdapter.ViewHolder>(){
     class ViewHolder( view: View) : RecyclerView.ViewHolder(view){
         val name=view.findViewById<TextView>(R.id.tvName)
-        val updateBtn=view.findViewById<Button>(R.id.updateBtn)
-        val deleteBtn=view.findViewById<Button>(R.id.deleteBtn)
+        val updateBtn=view.findViewById<ImageButton>(R.id.updateBtn)
+        val deleteBtn=view.findViewById<ImageButton>(R.id.deleteBtn)
         val img=view.findViewById<ImageView>(R.id.imgV)
     }
 

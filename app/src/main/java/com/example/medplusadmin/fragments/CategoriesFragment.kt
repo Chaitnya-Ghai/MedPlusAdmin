@@ -96,13 +96,13 @@ class CategoriesFragment : Fragment() {
                         ClickType.delete->{
                             db.collection(collectionName).document(model.id!!).delete()
                         }
-                        else -> {}
+                        else -> {/*nothing*/}
                     }
                 }
 
             }
         )
-        binding.categoryRv.layoutManager = GridLayoutManager(mainActivity,2)
+        binding.categoryRv.layoutManager = GridLayoutManager(mainActivity,1)
         binding.categoryRv.adapter = categoryAdapter
         categoryArray.clear()
         db.collection(collectionName).addSnapshotListener { snapshots, e ->
@@ -184,7 +184,7 @@ class CategoriesFragment : Fragment() {
                 }
                 else { /*if(imageSource !=null)*/
                     if (imageSource!!.startsWith("http")) {
-                        Log.e("img not updated ", "Image is from a URL: $imageSource", )
+                        Log.e("img not updated ", "Image is in from a URL: $imageSource", )
                         storeDataToFireStore(url = imageSource!!, position)
                         dialog.dismiss()
                     } else {
