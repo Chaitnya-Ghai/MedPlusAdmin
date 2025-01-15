@@ -1,10 +1,21 @@
 package com.example.medplusadmin
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.Settings
+import android.util.Log
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -20,6 +31,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
     lateinit var appBarConfiguration:AppBarConfiguration
     lateinit var navController: NavController
+//    permissions
+    private val PERMISSION_REQUEST_CODE = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,11 +51,70 @@ class MainActivity : AppCompatActivity() {
         actionBarDrawerToggle.syncState()//set automatically and sync whether drawer open or not
         appBarConfiguration = AppBarConfiguration(navController.graph,drawerLayout)
         setupActionBarWithNavController(navController,appBarConfiguration)
+        binding.switchDarkMode.setOnClickListener{ handleDarkMode()}
+        EnableNavigationFun()
+        checkAndRequirePermission()
+    }
+    private fun handleDarkMode(){
+        /* IMPLEMENT KRNA HAI*/
+    }
+     fun arePermissionsGranted(): Boolean {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        Environment.isExternalStorageManager()
+    } else {
+        ContextCompat.checkSelfPermission(
+            this,
+            android.Manifest.permission.READ_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+}
+// permission nhi hai = settings sai lao
+    fun requestManageExternalStoragePermission() {
+        try {
+            val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
+                    data = Uri.parse("package:${this@MainActivity.packageName}")
+                }
 
+            }
+            else {
+                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.parse("package:${this@MainActivity.packageName}")
+                }
+            }
+            startActivity(intent)
+        }
+        catch (e: ActivityNotFoundException) {
+            Toast.makeText(this, "Permission settings not found", Toast.LENGTH_SHORT).show()
+        }
+    }
+    fun checkAndRequirePermission(){
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q){
+            if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.R){
+                if (Environment.isExternalStorageManager()){ /*permission granted*/ }
+                else{ requestManageExternalStoragePermission()}
+            }
+            else{
+                if (ContextCompat.checkSelfPermission(this,
+                        android.Manifest.permission.MANAGE_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED
+                    )
+                {
+                    requestManageExternalStoragePermission()
+                }
+            }
+        }
+        else{
+            if (ContextCompat.checkSelfPermission(this,android.Manifest.permission.READ_EXTERNAL_STORAGE  )!=PackageManager.PERMISSION_GRANTED ){
+                ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),PERMISSION_REQUEST_CODE)
+            }
+        }
+    }
+// navigation view functionality code
+    private fun EnableNavigationFun(){
         navController.addOnDestinationChangedListener { _, destination, _ ->
             if (destination.id != R.id.manageUsersFragment) {
                 supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            actionBarDrawerToggle.syncState()
+                actionBarDrawerToggle.syncState()
             }
         }
         binding.navView.setNavigationItemSelectedListener{
@@ -51,12 +123,12 @@ class MainActivity : AppCompatActivity() {
                 R.id.home ->{
                     navController.navigate(R.id.manageUsersFragment)
                 }
-               R.id.catNavItem ->{
-                   navController.navigate(R.id.categoriesFragment)
-               }
+                R.id.catNavItem ->{
+                    navController.navigate(R.id.categoriesFragment)
+                }
                 R.id.mediNavItem ->{
                     navController.navigate(R.id.medicinesFragment)
-               }
+                }
                 R.id.dashNavItem ->{
                     navController.navigate(R.id.dashboardFragment)
                 }

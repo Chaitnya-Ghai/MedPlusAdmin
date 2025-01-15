@@ -47,9 +47,18 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.androidx.navigation.fragment)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation ("com.airbnb.android:lottie:3.4.0")
+    implementation ("com.airbnb.android:lottie:3.4.0")//lottie animation
+    //    supabase
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.0.2"))
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation("io.ktor:ktor-client-android:3.0.2")
+    implementation("io.github.jan-tennert.supabase:storage-kt:3.0.2")
+    //    gilder dependencies
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.11.0")
 
 }

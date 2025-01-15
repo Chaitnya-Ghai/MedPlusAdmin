@@ -17,30 +17,34 @@
             android:layout_margin="@dimen/_25sp"
             android:layout_gravity="center"
             android:id="@+id/imgV"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="@dimen/_25sp"
-            android:id="@+id/constraintAdapter">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:layout_marginHorizontal="@dimen/_20sp"
+                android:layout_marginBottom="@dimen/_20sp"
                 android:id="@+id/tvName"
                 android:hint="name"
                 app:layout_constraintTop_toTopOf="@+id/constraintAdapter"
                 app:layout_constraintStart_toStartOf="@+id/constraintAdapter"/>
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/deleteBtn"
-                android:layout_weight="1"
-                android:text="Delete"
-                app:layout_constraintTop_toBottomOf="@id/tvName"
-                app:layout_constraintEnd_toEndOf="@id/constraintAdapter"/>
 
-        </LinearLayout>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/deleteBtn"
+            android:layout_weight="1"
+            android:text="@string/delete"
+            app:layout_constraintTop_toBottomOf="@id/tvName"
+            app:layout_constraintEnd_toEndOf="@id/constraintAdapter"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/updateBtn"
+            android:layout_weight="1"
+            android:text="@string/update"
+            app:layout_constraintTop_toBottomOf="@id/tvName"
+            app:layout_constraintEnd_toEndOf="@id/constraintAdapter"/>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
