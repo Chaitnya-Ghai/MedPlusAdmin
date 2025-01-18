@@ -27,15 +27,32 @@
         <action
             android:id="@+id/action_categoriesFragment_to_medicinesFragment"
             app:destination="@id/medicinesFragment" />
+        <action
+            android:id="@+id/action_categoriesFragment_to_filterMedicinesFragment"
+            app:destination="@id/filterMedicinesFragment" />
     </fragment>
     <fragment
         android:id="@+id/medicinesFragment"
         android:name="com.example.medplusadmin.fragments.MedicinesFragment"
         android:label="Medicines"
-        tools:layout="@layout/fragment_medicines" />
+        tools:layout="@layout/fragment_medicines" >
+        <action
+            android:id="@+id/action_medicinesFragment_to_medicineDetailsFragment"
+            app:destination="@id/medicineDetailsFragment" />
+    </fragment>
     <fragment
         android:id="@+id/dashboardFragment"
         android:name="com.example.medplusadmin.fragments.DashboardFragment"
         android:label="Dashboard"
         tools:layout="@layout/fragment_dashboard" />
+    <fragment
+        android:id="@+id/medicineDetailsFragment"
+        android:name="com.example.medplusadmin.fragments.MedicineDetailsFragment"
+        android:label="fragment_medicine_details"
+        tools:layout="@layout/fragment_medicine_details" />
+    <fragment
+        android:id="@+id/filterMedicinesFragment"
+        android:name="com.example.medplusadmin.fragments.FilterMedicinesFragment"
+        android:label="fragment_filter_medicines"
+        tools:layout="@layout/fragment_filter_medicines" />
 </navigation>

@@ -1,13 +1,13 @@
-package com.example.medplusadmin.fragments
+package com.example.medplusadmin.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.medplusadmin.R
@@ -21,10 +21,11 @@ class CategoryAdapter(var context: Context, var list: MutableList<CategoryModel>
         val updateBtn=view.findViewById<ImageButton>(R.id.updateBtn)
         val deleteBtn=view.findViewById<ImageButton>(R.id.deleteBtn)
         val img=view.findViewById<ImageView>(R.id.imgV)
+        val card = view.findViewById<CardView>(R.id.recycler_layout_xml)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view =LayoutInflater.from(parent.context).inflate(R.layout.item_category,parent,false)
+        val view =LayoutInflater.from(parent.context).inflate(R.layout.item_list,parent,false)
         return ViewHolder(view)
     }
 
@@ -38,6 +39,7 @@ class CategoryAdapter(var context: Context, var list: MutableList<CategoryModel>
             .load(list[position].imageUrl)
             .centerCrop()
             .into(holder.img)
+        holder.card.setOnClickListener { categoryInterface.onClick(position,list[position],ClickType.onClick) }
         holder.updateBtn.setOnClickListener { categoryInterface.onClick(position,list[position],ClickType.update) }
         holder.deleteBtn.setOnClickListener { categoryInterface.onClick(position,list[position],ClickType.delete) }
     }

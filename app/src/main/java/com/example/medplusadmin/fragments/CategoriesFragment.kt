@@ -14,12 +14,13 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.medplusadmin.MainActivity
 import com.example.medplusadmin.MyApplication
 import com.example.medplusadmin.R
+import com.example.medplusadmin.adapters.CategoryAdapter
 import com.example.medplusadmin.dataClasses.CategoryModel
 import com.example.medplusadmin.databinding.CustomDialogBinding
 import com.example.medplusadmin.databinding.FragmentCategoriesBinding
@@ -29,6 +30,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.firestore.firestore
+import com.google.gson.GsonBuilder
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.jan.supabase.storage.storage
@@ -57,13 +59,14 @@ class CategoriesFragment : Fragment() {
     private var categoryArray = mutableListOf<CategoryModel>()
     val collectionName = "category"
     val updateStr="update"
-    private  lateinit var categoryAdapter :CategoryAdapter
+    private  lateinit var categoryAdapter : CategoryAdapter
     val db = Firebase.firestore
     lateinit var supabaseClient: SupabaseClient
     lateinit var imgUri:Uri
     lateinit var publicUrl:String
     private var imageSource: String? = null
-
+//
+private var categoryPairsList = mutableListOf<Pair<String,String>>()//list of category id
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,7 +89,7 @@ class CategoriesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        categoryAdapter=CategoryAdapter(mainActivity,categoryArray ,
+        categoryAdapter= CategoryAdapter(mainActivity,categoryArray,
             object : CategoryInterface{
                 override fun onClick(position: Int, model: CategoryModel, onClickType: ClickType?) {
                     when(onClickType){
@@ -96,10 +99,16 @@ class CategoriesFragment : Fragment() {
                         ClickType.delete->{
                             db.collection(collectionName).document(model.id!!).delete()
                         }
+                        ClickType.onClick ->{
+                            val bundle=Bundle()
+                            bundle.putString("categorySelected",
+                                GsonBuilder().create().toJson(categoryPairsList[position]))
+                            Toast.makeText(mainActivity, "${categoryPairsList[position].second} is clicked", Toast.LENGTH_SHORT).show()
+                            findNavController().navigate(R.id.action_categoriesFragment_to_filterMedicinesFragment,bundle)
+                        }
                         else -> {/*nothing*/}
                     }
                 }
-
             }
         )
         binding.categoryRv.layoutManager = GridLayoutManager(mainActivity,1)
@@ -113,7 +122,8 @@ class CategoriesFragment : Fragment() {
             for(snapshot in snapshots!!.documentChanges) {
                 val model = convertObject(snapshot.document)
                 when(snapshot.type){
-                    DocumentChange.Type.ADDED ->{model.let { categoryArray.add(it) }}
+                    DocumentChange.Type.ADDED ->{model.let { categoryArray.add(it)
+                        model.let { categoryPairsList.add(it.id.toString() to it.categoryName.toString()) } }}
                     DocumentChange.Type.MODIFIED->{
                         model.let {
                             val index = getIndex(model)
@@ -233,6 +243,7 @@ class CategoriesFragment : Fragment() {
                 binding.loader.visibility=View.GONE
                 customDialogBinding.saveBtn.visibility=View.VISIBLE
                 Toast.makeText(mainActivity, "Error: ${it.message}", Toast.LENGTH_SHORT).show()
+                db.collection("medicines").document()
             }
         }
 

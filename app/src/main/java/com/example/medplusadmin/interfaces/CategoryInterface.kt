@@ -6,5 +6,5 @@ interface CategoryInterface {
     fun onClick(position: Int, model: CategoryModel , onClickType: ClickType?=ClickType.nothing)
 }
 enum class ClickType{
-    update , delete , nothing
+    update , delete , nothing , onClick
 }
