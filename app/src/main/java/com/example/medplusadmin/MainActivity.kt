@@ -23,14 +23,19 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.example.medplusadmin.Constants.Companion.category
 import com.example.medplusadmin.databinding.ActivityMainBinding
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 
 class MainActivity : AppCompatActivity() {
     val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
-    lateinit var drawerLayout: DrawerLayout
-    lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
-    lateinit var appBarConfiguration:AppBarConfiguration
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
+    private lateinit var appBarConfiguration:AppBarConfiguration
     lateinit var navController: NavController
+    private val firestore=Firebase.firestore
+    var categoryArrayPair= mutableListOf<Pair<String,String>>()
 //    permissions
     private val PERMISSION_REQUEST_CODE = 100
 
@@ -38,6 +43,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(binding.root)
+        firestore.collection(category).get().addOnSuccessListener { documents ->
+            for (document in documents) {
+                Log.d("firestore", "${document.id} => ${document.data}")
+                categoryArrayPair.add(
+                    document.data.get("id").toString() to document.data.get("categoryName")
+                        .toString()
+                )
+            }
+        }
+            .addOnFailureListener { exception ->
+                Log.w("firestore", "Error getting documents.", exception)
+            }
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -55,6 +72,8 @@ class MainActivity : AppCompatActivity() {
         EnableNavigationFun()
         checkAndRequirePermission()
     }
+
+
     private fun handleDarkMode(){
         /* IMPLEMENT KRNA HAI*/
     }

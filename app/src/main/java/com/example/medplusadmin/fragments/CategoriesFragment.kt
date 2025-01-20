@@ -1,6 +1,7 @@
 package com.example.medplusadmin.fragments
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
@@ -21,6 +22,7 @@ import com.example.medplusadmin.MainActivity
 import com.example.medplusadmin.MyApplication
 import com.example.medplusadmin.R
 import com.example.medplusadmin.adapters.CategoryAdapter
+import com.example.medplusadmin.convertCategoryObject
 import com.example.medplusadmin.dataClasses.CategoryModel
 import com.example.medplusadmin.databinding.CustomDialogBinding
 import com.example.medplusadmin.databinding.FragmentCategoriesBinding
@@ -28,7 +30,6 @@ import com.example.medplusadmin.interfaces.CategoryInterface
 import com.example.medplusadmin.interfaces.ClickType
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.DocumentChange
-import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.firestore.firestore
 import com.google.gson.GsonBuilder
 import io.github.jan.supabase.SupabaseClient
@@ -54,16 +55,16 @@ class CategoriesFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private val binding by lazy { FragmentCategoriesBinding.inflate(layoutInflater) }
-    lateinit var mainActivity:MainActivity
-    lateinit var customDialogBinding: CustomDialogBinding
+    private lateinit var mainActivity:MainActivity
+    private lateinit var customDialogBinding: CustomDialogBinding
     private var categoryArray = mutableListOf<CategoryModel>()
-    val collectionName = "category"
-    val updateStr="update"
+    private val collectionName = "category"
+    private val updateStr="update"
     private  lateinit var categoryAdapter : CategoryAdapter
-    val db = Firebase.firestore
-    lateinit var supabaseClient: SupabaseClient
-    lateinit var imgUri:Uri
-    lateinit var publicUrl:String
+    private val db = Firebase.firestore
+    private lateinit var supabaseClient: SupabaseClient
+    private lateinit var imgUri:Uri
+    private lateinit var publicUrl:String
     private var imageSource: String? = null
 //
 private var categoryPairsList = mutableListOf<Pair<String,String>>()//list of category id
@@ -97,7 +98,15 @@ private var categoryPairsList = mutableListOf<Pair<String,String>>()//list of ca
                             openDialog(position)
                         }
                         ClickType.delete->{
-                            db.collection(collectionName).document(model.id!!).delete()
+                            AlertDialog.Builder(mainActivity).apply {
+                                setTitle(" Are you sure?")
+                                setPositiveButton("Delete") { _, _ ->
+                                    db.collection(collectionName).document(model.id!!).delete()
+                                }
+                                setNegativeButton("No") { _, _ -> }
+                                setCancelable(true)
+                                show()
+                            }
                         }
                         ClickType.onClick ->{
                             val bundle=Bundle()
@@ -120,10 +129,10 @@ private var categoryPairsList = mutableListOf<Pair<String,String>>()//list of ca
                 return@addSnapshotListener
             }
             for(snapshot in snapshots!!.documentChanges) {
-                val model = convertObject(snapshot.document)
+                val model = convertCategoryObject(snapshot.document)
                 when(snapshot.type){
                     DocumentChange.Type.ADDED ->{model.let { categoryArray.add(it)
-                        model.let { categoryPairsList.add(it.id.toString() to it.categoryName.toString()) } }}
+                        categoryPairsList.add(it.id.toString() to it.categoryName.toString()) }}
                     DocumentChange.Type.MODIFIED->{
                         model.let {
                             val index = getIndex(model)
@@ -146,17 +155,11 @@ private var categoryPairsList = mutableListOf<Pair<String,String>>()//list of ca
         }
         binding.categoryBtn.setOnClickListener { openDialog() }
     }
-    fun getIndex(userModel: CategoryModel): Int {
+    private fun getIndex(userModel: CategoryModel): Int {
         var index = -1
         index = categoryArray.indexOfFirst { element ->element.id?.equals(userModel.id) == true }
         return index
     }
-    private fun convertObject(snapshot: QueryDocumentSnapshot): CategoryModel {
-        val model = snapshot.toObject(CategoryModel::class.java)
-        model.id = snapshot.id ?: ""
-        return model
-    }
-
     private fun openDialog(position:Int = -1){
         customDialogBinding= CustomDialogBinding.inflate(layoutInflater)
         val dialog = Dialog(mainActivity).apply {
@@ -177,7 +180,7 @@ private var categoryPairsList = mutableListOf<Pair<String,String>>()//list of ca
             }
         }
         if (position > -1){
-            customDialogBinding.saveBtn.setText(updateStr)
+            customDialogBinding.saveBtn.text = updateStr
             customDialogBinding.name.setText(categoryArray[position].categoryName)
             Glide.with(mainActivity)
                 .load(categoryArray[position].imageUrl)
@@ -194,7 +197,7 @@ private var categoryPairsList = mutableListOf<Pair<String,String>>()//list of ca
                 }
                 else { /*if(imageSource !=null)*/
                     if (imageSource!!.startsWith("http")) {
-                        Log.e("img not updated ", "Image is in from a URL: $imageSource", )
+                        Log.e("img not updated ", "Image is in from a URL: $imageSource")
                         storeDataToFireStore(url = imageSource!!, position)
                         dialog.dismiss()
                     } else {
@@ -284,13 +287,11 @@ private var categoryPairsList = mutableListOf<Pair<String,String>>()//list of ca
             }
         }
     }
-
     private fun uriToByteArray(mainActivity: MainActivity, uri: Uri): ByteArray {
         val inputStream = mainActivity.contentResolver.openInputStream(uri)
         return inputStream?.readBytes() ?: ByteArray(0)
     }
-
-    val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.data?.let { uri ->
                 // Step 3: Handle the selected image URI
