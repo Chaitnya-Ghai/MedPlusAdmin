@@ -15,6 +15,7 @@
             android:id="@+id/imgDialog"
             android:layout_width="363dp"
             android:layout_height="150dp"
+            android:src="@drawable/categoryicon"
             android:layout_gravity="center"
             android:layout_margin="20dp"/>
 

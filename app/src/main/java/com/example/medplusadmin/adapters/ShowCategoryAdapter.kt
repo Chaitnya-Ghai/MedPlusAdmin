@@ -9,7 +9,7 @@ import com.example.medplusadmin.interfaces.ShowCategoryInterface
 import com.google.android.material.checkbox.MaterialCheckBox
 
 class ShowCategoryAdapter(
-    private val list: MutableList<Pair<String, String>>,
+    private var list: List<Pair<String, String>>,
     private val showCategory: ShowCategoryInterface
 ):RecyclerView.Adapter<ShowCategoryAdapter.ViewHolder>() {
 
@@ -40,5 +40,9 @@ class ShowCategoryAdapter(
                  }
              }
         }
+    }
+    fun updateData(newList: List<Pair<String, String>>) {
+        list = newList
+        notifyDataSetChanged()
     }
 }

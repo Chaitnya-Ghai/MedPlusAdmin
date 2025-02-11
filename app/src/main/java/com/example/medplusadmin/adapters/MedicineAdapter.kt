@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.medplusadmin.R
 import com.example.medplusadmin.dataClasses.MedicineModel
@@ -11,7 +12,9 @@ import com.example.medplusadmin.interfaces.MedicineInterface
 
 data class MedicineAdapter(var context: Context, var list: MutableList<MedicineModel>, var medicineInterface : MedicineInterface):RecyclerView.Adapter<MedicineAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-
+        val deleteBtn = view.findViewById<ImageView>(R.id.delete)
+        val editBtn = view.findViewById<ImageView>(R.id.edit)
+        val img = view.findViewById<ImageView>(R.id.image)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -24,6 +27,6 @@ data class MedicineAdapter(var context: Context, var list: MutableList<MedicineM
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder
+
     }
 }

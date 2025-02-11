@@ -43,18 +43,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(binding.root)
-        firestore.collection(category).get().addOnSuccessListener { documents ->
-            for (document in documents) {
-                Log.d("firestore", "${document.id} => ${document.data}")
-                categoryArrayPair.add(
-                    document.data.get("id").toString() to document.data.get("categoryName")
-                        .toString()
-                )
-            }
-        }
-            .addOnFailureListener { exception ->
-                Log.w("firestore", "Error getting documents.", exception)
-            }
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -128,7 +116,27 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-// navigation view functionality code
+
+//    private
+fun getDataByCategory(callback: (List<Pair<String, String>>) -> Unit) {
+    firestore.collection(category).get()
+        .addOnSuccessListener { documents ->
+            val tempList = mutableListOf<Pair<String, String>>()
+            for (document in documents) {
+                Log.d("firestore", "${document.id} => ${document.data}")
+                tempList.add(
+                    document.getString("id").orEmpty() to document.getString("categoryName").orEmpty()
+                )
+            }
+            callback(tempList) // Return data after Firestore fetch
+        }
+        .addOnFailureListener { exception ->
+            Log.w("firestore", "Error getting documents.", exception)
+            callback(emptyList()) // Return empty list on failure
+        }
+}
+
+    // navigation view functionality code
     private fun EnableNavigationFun(){
         navController.addOnDestinationChangedListener { _, destination, _ ->
             if (destination.id != R.id.manageUsersFragment) {

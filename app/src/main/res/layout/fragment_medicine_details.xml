@@ -6,6 +6,14 @@
     android:keepScreenOn="true"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.MedicineDetailsFragment">
+    <ProgressBar
+        android:layout_width="@dimen/_100sp"
+        android:layout_height="@dimen/_100sp"
+        android:layout_gravity="center"
+        android:elevation="@dimen/_100sp"
+        android:visibility="gone"
+        android:id="@+id/loader"
+        />
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent">

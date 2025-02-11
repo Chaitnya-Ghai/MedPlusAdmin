@@ -28,6 +28,7 @@ import com.example.medplusadmin.databinding.CustomDialogBinding
 import com.example.medplusadmin.databinding.FragmentCategoriesBinding
 import com.example.medplusadmin.interfaces.CategoryInterface
 import com.example.medplusadmin.interfaces.ClickType
+import com.example.medplusadmin.uriToByteArray
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.firestore
@@ -286,10 +287,6 @@ private var categoryPairsList = mutableListOf<Pair<String,String>>()//list of ca
                 Toast.makeText(mainActivity, "upload to supabase Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
-    }
-    private fun uriToByteArray(mainActivity: MainActivity, uri: Uri): ByteArray {
-        val inputStream = mainActivity.contentResolver.openInputStream(uri)
-        return inputStream?.readBytes() ?: ByteArray(0)
     }
     private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
