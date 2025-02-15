@@ -42,6 +42,9 @@
         <action
             android:id="@+id/action_medicinesFragment_to_filterMedicinesFragment"
             app:destination="@id/filterMedicinesFragment" />
+        <action
+            android:id="@+id/action_medicinesFragment_to_showSingleMedicineFragment"
+            app:destination="@id/showSingleMedicineFragment" />
     </fragment>
     <fragment
         android:id="@+id/dashboardFragment"
@@ -57,5 +60,14 @@
         android:id="@+id/filterMedicinesFragment"
         android:name="com.example.medplusadmin.fragments.FilterMedicinesFragment"
         android:label="fragment_filter_medicines"
-        tools:layout="@layout/fragment_filter_medicines" />
+        tools:layout="@layout/fragment_filter_medicines" >
+        <action
+            android:id="@+id/action_filterMedicinesFragment_to_showSingleMedicineFragment"
+            app:destination="@id/showSingleMedicineFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/showSingleMedicineFragment"
+        android:name="com.example.medplusadmin.fragments.ShowSingleMedicineFragment"
+        android:label="fragment_show_single_medicine"
+        tools:layout="@layout/fragment_show_single_medicine" />
 </navigation>

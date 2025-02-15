@@ -3,6 +3,7 @@ package com.example.medplusadmin
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -35,7 +36,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration:AppBarConfiguration
     lateinit var navController: NavController
     private val firestore=Firebase.firestore
-    var categoryArrayPair= mutableListOf<Pair<String,String>>()
 //    permissions
     private val PERMISSION_REQUEST_CODE = 100
 
@@ -52,6 +52,8 @@ class MainActivity : AppCompatActivity() {
         drawerLayout=findViewById(R.id.main)
         actionBarDrawerToggle = ActionBarDrawerToggle(this,drawerLayout,R.string.open,R.string.close)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setBackgroundDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.lightGreen)))
+        actionBarDrawerToggle.drawerArrowDrawable.color = ContextCompat.getColor(this, R.color.brightGreen)
         drawerLayout.addDrawerListener(actionBarDrawerToggle)
         actionBarDrawerToggle.syncState()//set automatically and sync whether drawer open or not
         appBarConfiguration = AppBarConfiguration(navController.graph,drawerLayout)
@@ -116,26 +118,23 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-//    private
-fun getDataByCategory(callback: (List<Pair<String, String>>) -> Unit) {
-    firestore.collection(category).get()
-        .addOnSuccessListener { documents ->
-            val tempList = mutableListOf<Pair<String, String>>()
-            for (document in documents) {
-                Log.d("firestore", "${document.id} => ${document.data}")
-                tempList.add(
-                    document.getString("id").orEmpty() to document.getString("categoryName").orEmpty()
-                )
+    fun getDataByCategory(callback: (List<Pair<String, String>>) -> Unit) {
+        firestore.collection(category).get()
+            .addOnSuccessListener { documents ->
+                val tempList = mutableListOf<Pair<String, String>>()
+                for (document in documents) {
+                    Log.d("firestore", "${document.id} => ${document.data}")
+                    tempList.add(
+                        document.getString("id").orEmpty() to document.getString("categoryName").orEmpty()
+                    )
+                }
+                callback(tempList) // Return data after Firestore fetch
             }
-            callback(tempList) // Return data after Firestore fetch
-        }
-        .addOnFailureListener { exception ->
-            Log.w("firestore", "Error getting documents.", exception)
-            callback(emptyList()) // Return empty list on failure
-        }
-}
-
+            .addOnFailureListener { exception ->
+                Log.w("firestore", "Error getting documents.", exception)
+                callback(emptyList()) // Return empty list on failure
+            }
+    }
     // navigation view functionality code
     private fun EnableNavigationFun(){
         navController.addOnDestinationChangedListener { _, destination, _ ->

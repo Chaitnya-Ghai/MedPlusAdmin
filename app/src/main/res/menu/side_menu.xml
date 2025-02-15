@@ -2,28 +2,28 @@
 <menu xmlns:android = "http://schemas.android.com/apk/res/android"
     xmlns:tools = "http://schemas.android.com/tools"
     tools:showIn = "navigation_view">
-    <group android:checkableBehavior = "single">
+    <group android:checkableBehavior="none">
         <item
             android:id = "@+id/home"
-            android:title = "Home"
+            android:title = "@string/home"
             android:icon="@drawable/homeicon"/>
         <item
             android:id = "@+id/catNavItem"
-            android:title = "Categories"
+            android:title = "@string/categories"
             android:icon="@drawable/categoryicon"/>
         <item
             android:id = "@+id/mediNavItem"
-            android:title = "Medicines"
+            android:title = "@string/medicines"
             android:icon="@drawable/medicineicon"/>
         <item
             android:id = "@+id/dashNavItem"
-            android:title = "Dashboard"
+            android:title = "@string/dashboard"
             android:icon="@drawable/dashboardicon"/>
         <item android:title="About Us ">
             <menu>
                 <item
                     android:id = "@+id/support"
-                    android:title = "Support  &amp;  Help"
+                    android:title = "@string/support_help"
                     android:icon="@drawable/help"/>
             </menu>
         </item>

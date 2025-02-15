@@ -10,4 +10,7 @@
     <string name="update">Update</string>
     <string name="medicines">Medicines</string>
     <string name="categories">Categories</string>
+    <string name="home">Home</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="support_help"><![CDATA[Support & Help]]></string>
 </resources>

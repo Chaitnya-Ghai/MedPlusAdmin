@@ -74,6 +74,8 @@ class MedicineDetailsFragment : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+//        This ensures that fetchMedicineDetails() is only called when medicineId is not null.
+        arguments?.getString("medicineId")?.let { fetchMedicineDetails(it) } ?: return
     }
 
     override fun onCreateView(
@@ -91,7 +93,6 @@ class MedicineDetailsFragment : Fragment() {
                     categoryList[position].let { selectedCategoryIdsList.add(it) }
                     Toast.makeText(mainActivity, "added", Toast.LENGTH_SHORT).show()
                 }
-
                 override fun unTick(position: Int) {
                     categoryList[position].let { selectedCategoryIdsList.remove(it) }
                     Toast.makeText(mainActivity, "removed", Toast.LENGTH_SHORT).show()
@@ -100,12 +101,10 @@ class MedicineDetailsFragment : Fragment() {
             binding.categoriesSelected.adapter = showCategoryAdapter
             binding.categoriesSelected.layoutManager = GridLayoutManager(mainActivity, 4)
         }
-
         // Fetch categories and update adapter dynamically
         mainActivity.getDataByCategory { categoryList ->
             showCategoryAdapter?.updateData(categoryList)  // Update adapter when data is fetched
         }
-
         binding.saveMed.setOnClickListener {
             if (validation()){
                 if (imageSource!!.startsWith("http")) {
@@ -116,7 +115,6 @@ class MedicineDetailsFragment : Fragment() {
                 }
                 Toast.makeText(mainActivity, "Medicine Added", Toast.LENGTH_SHORT).show() }
         }
-
 
         binding.circularImageView.setOnClickListener {
             if (mainActivity.arePermissionsGranted()){ openImagePicker() }
@@ -153,7 +151,7 @@ class MedicineDetailsFragment : Fragment() {
         }
         // Validate all fields
         for ((editText, errorMessage) in fields) {
-            if (editText.text?.trim().isNullOrEmpty()) {
+            if (editText.text?.toString()?.trim().isNullOrEmpty()) {
                 editText.error = errorMessage
                 return false
             }
@@ -219,6 +217,8 @@ class MedicineDetailsFragment : Fragment() {
             precautions = binding.etPrecautions.text.toString(),
             storageInfo = binding.etStorage.text.toString(),
             sideEffects = binding.etSideEffect.text.toString(),
+            unit =  binding.etUnits.text.toString(),
+            dosageForm =  binding.etDosage.text.toString(),
             belongingCategory = selectedCategoryIdsList.map { it.first }.toMutableList(),
             productDetail = ProductDetail(
                 originalPrice = binding.etPrice.text.toString(),
@@ -250,6 +250,41 @@ class MedicineDetailsFragment : Fragment() {
         imagePickerLauncher.launch(intent)  // Launch the image picker
     }
 
+
+
+    fun updateUI(medicine: MedicineModel) {
+        selectedCategoryIdsList.clear()
+        Glide.with(mainActivity).apply {
+            load(medicine.medicineImg).into(binding.circularImageView)
+        }
+        binding.etMedName.setText(medicine.medicineName)
+        binding.etPrice.setText(medicine.productDetail?.originalPrice)
+        binding.etDescription.setText(medicine.description)
+        binding.etIngredients.setText(medicine.ingredients)
+        binding.etDosage.setText(medicine.dosageForm)
+        binding.etUnits.setText(medicine.unit)
+        binding.etHowToUse.setText(medicine.howToUse)
+        binding.etPrecautions.setText(medicine.precautions)
+        binding.etStorage.setText(medicine.storageInfo)
+        binding.etSideEffect.setText(medicine.sideEffects)
+        binding.etExpiryDate.setText(medicine.productDetail?.expiryDate)
+        medicine.belongingCategory?.let { selectedCategoryIdsList.addAll(it.map { Pair(it, it) }) }
+//        add krliya hai but ui pr set karana hai.
+        imageSource=medicine.medicineImg
+    }
+    private fun fetchMedicineDetails(medicineId: String) {
+        Firebase.firestore.collection("medicines").document(medicineId)
+            .get()
+            .addOnSuccessListener { document ->
+                val medicine = document.toObject(MedicineModel::class.java)
+                if (medicine != null) {
+                    updateUI(medicine)
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("MedicineDetails", "Error fetching data: ${e.message}")
+            }
+    }
     companion object {
         /**
          * Use this factory method to create a new instance of

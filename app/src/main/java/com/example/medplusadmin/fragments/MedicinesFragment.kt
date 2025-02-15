@@ -3,11 +3,14 @@ package com.example.medplusadmin.fragments
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.medplusadmin.Constants.Companion.medicines
 import com.example.medplusadmin.MainActivity
@@ -33,13 +36,13 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class MedicinesFragment : Fragment() {
-    // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
     private val binding by lazy { FragmentMedicinesBinding.inflate(layoutInflater) }
     lateinit var mainActivity: MainActivity
-    var medicineList= mutableListOf<MedicineModel>()
-    var db=Firebase.firestore
+    private val medicineList = mutableListOf<MedicineModel>()
+    private val db = Firebase.firestore
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mainActivity = activity as MainActivity
@@ -51,41 +54,8 @@ class MedicinesFragment : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
-        db.collection(medicines).addSnapshotListener{snaphots, e ->
-            if (e !=null){
-                return@addSnapshotListener
-            }
-            for (snapshot in snaphots!!.documentChanges){
-                val model = convertMedicineObject(snapshot.document)
-                when(snapshot.type){
-                    DocumentChange.Type.ADDED->{ model.let { medicineList.add(it) } }
-                    DocumentChange.Type.REMOVED->{
-                        model.let {
-                            val i = getIndex(model)
-                            if ( i > -1 ){
-                                medicineList.removeAt(i)
-                            }
-                        }
-                    }
-                    DocumentChange.Type.MODIFIED->{
-                        model.let {
-                            val i = getIndex(model)
-                            if ( i > -1 ){
-                                medicineList[i]=model
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
-private fun getIndex(model:MedicineModel):Int{
-    var index = -1;
-    index = medicineList.indexOfFirst {
-        element -> element.id?.equals(model.id) == true
-    }
-    return index
-}
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -96,51 +66,74 @@ private fun getIndex(model:MedicineModel):Int{
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.MedicinesRv.layoutManager=LinearLayoutManager(mainActivity)
-        binding.MedicinesRv.adapter = MedicineAdapter(mainActivity,medicineList,object :
-            MedicineInterface {
-            override fun onMedClick(
-                position: Int,
-                model: MedicineModel,
-                onMedicineClickType: medicineCLick?
-            ) {
-                when(onMedicineClickType){
-                    medicineCLick.delete->{
+        binding.MedicinesRv.layoutManager = GridLayoutManager(mainActivity,2)
+        binding.MedicinesRv.adapter = MedicineAdapter(mainActivity, medicineList, object : MedicineInterface {
+            override fun onMedClick(position: Int, model: MedicineModel, onMedicineClickType: medicineCLick?) {
+                when (onMedicineClickType) {
+                    medicineCLick.delete -> {
                         AlertDialog.Builder(mainActivity).apply {
                             setTitle("Are you sure?")
-                            setPositiveButton("Delete"){_,_->
-                                db.collection(medicines).document(model.id!!).delete()
+                            setPositiveButton("Delete") { _, _ ->
+                                db.collection("medicines").document(model.id!!).delete()
+                                    .addOnSuccessListener {
+                                        medicineList.remove(model)
+                                        binding.MedicinesRv.adapter?.notifyDataSetChanged() // Force update UI
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Log.e("DeleteMedicine", "Error deleting: ${e.message}")
+                                    }
                             }
-                            setNegativeButton("No"){_,_->}
+
+                            setNegativeButton("No") { _, _ -> }
+                            show() // Show dialog
                         }
                     }
                     medicineCLick.onclick->{
                         val bundle=Bundle()
-                        bundle.putString("medicineId", medicineList[position].id )
-                        findNavController().navigate(R.id.action_medicinesFragment_to_filterMedicinesFragment,bundle)
+                        bundle.putString("medicineId", medicineList[position].id!!)
+                        findNavController().navigate(R.id.action_medicinesFragment_to_showSingleMedicineFragment,bundle)
                     }
                     medicineCLick.update->{
                         val bundle=Bundle()
-                        bundle.putString("medicineId", medicineList[position].id )
+                        bundle.putString("medicineId", medicineList[position].id!!)
                         findNavController().navigate(R.id.action_medicinesFragment_to_medicineDetailsFragment ,bundle)}
                     else->{/*NOTHING*/}
                 }
             }
         })
+        binding.loader.visibility = View.VISIBLE // Show loader while fetching data
+        medicineList.clear()
+        db.collection(medicines).addSnapshotListener { snapshots, e ->
+            if (e != null) return@addSnapshotListener
+            for (snapshot in snapshots!!.documentChanges) {
+                val model = convertMedicineObject(snapshot.document)
+                when (snapshot.type) {
+                    DocumentChange.Type.ADDED -> {
+                        medicineList.add(model)
+                    }
+                    DocumentChange.Type.REMOVED -> {
+                        val index = getIndex(model)
+                        if (index > -1) medicineList.removeAt(index)
+                    }
+                    DocumentChange.Type.MODIFIED -> {
+                        val index = getIndex(model)
+                        if (index > -1) medicineList[index] = model
+                    }
+                }
+                binding.MedicinesRv.adapter?.notifyDataSetChanged()
+            }
+            binding.loader.visibility = View.GONE // Hide loader after updating list
+        }
+
         binding.addMedicine.setOnClickListener {
             findNavController().navigate(R.id.action_medicinesFragment_to_medicineDetailsFragment)
         }
     }
+    private fun getIndex(model: MedicineModel): Int {
+        return medicineList.indexOfFirst { it.id == model.id }
+    }
+
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment MedicinesFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             MedicinesFragment().apply {

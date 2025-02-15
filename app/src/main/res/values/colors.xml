@@ -2,22 +2,42 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="colorPrimary">#A8DADC</color>
-    <color name="colorPrimaryVariant">#72BFA1</color>
-    <color name="colorOnPrimary">#1D3557</color>
 
-    <!-- Secondary Colors for Dark Mode -->
-    <color name="colorSecondary">#457B9D</color>
-    <color name="colorSecondaryVariant">#102A43</color>
-    <color name="colorOnSecondary">#F1FAEE</color>
+    <!-- Primary Colors -->
+    <color name="colorPrimary">@color/brightGreen</color>
+    <color name="colorPrimaryVariant">@color/green</color>
+    <color name="colorOnPrimary">@color/white</color>
 
-    <!-- Background and Surface for Dark Mode -->
-    <color name="colorBackground">#1D3557</color>
-    <color name="colorOnBackground">#F1FAEE</color>
-    <color name="colorSurface">#102A43</color>
-    <color name="colorOnSurface">#A8DADC</color>
+    <!-- Secondary Colors -->
+    <color name="colorSecondary">@color/darkGreen</color>
+    <color name="colorSecondaryVariant">@color/green</color>
+    <color name="colorOnSecondary">@color/bg</color>
+
+    <!-- Background and Surface -->
+    <color name="colorBackground">@color/bg</color>
+    <color name="colorOnBackground">@color/green</color>
+    <color name="colorSurface">@color/lightGreen</color>
+    <color name="colorOnSurface">@color/darkGrey</color>
+
+    <!-- FAB, Navigation, Bottom Bar -->
+    <color name="fabColor">@color/darkGreen</color>
+    <color name="bottomNavColor">@color/bg</color>
+    <color name="navDrawerBg">@color/lightGreen</color>
+    <color name="navDrawerItem">@color/darkGreen</color>
 
     <!-- Error Colors -->
     <color name="colorError">#E63946</color>
     <color name="colorOnError">#FFFFFF</color>
+
+    <!-- Other Colors -->
+    <color name="transparent">#00000000</color>
+    <color name="bg">#FCFCFC</color>
+    <color name="lightGreen">#E6FEEA</color>
+    <color name="darkGreen">#47D057</color>
+    <color name="green">#009444</color>
+    <color name="brightGreen">#47D057</color>
+    <color name="darkGrey">#464646</color>
+    <color name="mediumGrey">#575757</color>
+    <color name="subHeadingColor">#818181</color>
+    <color name="lightGrey">#D0D0D0</color>
 </resources>

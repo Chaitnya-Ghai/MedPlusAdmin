@@ -5,13 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.medplusadmin.R
 import com.example.medplusadmin.dataClasses.MedicineModel
 import com.example.medplusadmin.interfaces.MedicineInterface
+import com.example.medplusadmin.interfaces.medicineCLick
 
-data class MedicineAdapter(var context: Context, var list: MutableList<MedicineModel>, var medicineInterface : MedicineInterface):RecyclerView.Adapter<MedicineAdapter.ViewHolder>() {
+data class MedicineAdapter(var context: Context, var medicineList: MutableList<MedicineModel>, var medicineInterface : MedicineInterface):RecyclerView.Adapter<MedicineAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val price = view.findViewById<TextView>(R.id.price)
+        val name = view.findViewById<TextView>(R.id.name)
         val deleteBtn = view.findViewById<ImageView>(R.id.delete)
         val editBtn = view.findViewById<ImageView>(R.id.edit)
         val img = view.findViewById<ImageView>(R.id.image)
@@ -23,10 +28,17 @@ data class MedicineAdapter(var context: Context, var list: MutableList<MedicineM
     }
 
     override fun getItemCount(): Int {
-        return list.size
+        return medicineList.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
+        Glide.with(context)
+            .load(medicineList[position].medicineImg)
+            .into(holder.img)
+        holder.name.text = medicineList[position].medicineName
+        holder.price.text = medicineList[position].productDetail?.originalPrice
+        holder.editBtn.setOnClickListener { medicineInterface.onMedClick(position,medicineList[position],medicineCLick.update) }
+        holder.deleteBtn.setOnClickListener { medicineInterface.onMedClick(position,medicineList[position],medicineCLick.delete) }
+        holder.img.setOnClickListener { medicineInterface.onMedClick(position,medicineList[position],medicineCLick.onclick) }
     }
 }

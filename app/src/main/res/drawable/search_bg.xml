@@ -4,5 +4,5 @@
         android:radius="@dimen/_20sp"/>
     <stroke
         android:width="1sp"
-        android:color="@color/colorBackground"/>
+        android:color="@color/colorOnBackground"/>
 </shape>

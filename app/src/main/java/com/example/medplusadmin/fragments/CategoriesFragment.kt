@@ -91,6 +91,7 @@ private var categoryPairsList = mutableListOf<Pair<String,String>>()//list of ca
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.categoryBtn
         categoryAdapter= CategoryAdapter(mainActivity,categoryArray,
             object : CategoryInterface{
                 override fun onClick(position: Int, model: CategoryModel, onClickType: ClickType?) {
