@@ -84,7 +84,6 @@ class MainActivity : AppCompatActivity() {
                 Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
                     data = Uri.parse("package:${this@MainActivity.packageName}")
                 }
-
             }
             else {
                 Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {

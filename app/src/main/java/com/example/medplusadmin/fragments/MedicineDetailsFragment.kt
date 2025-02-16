@@ -61,6 +61,7 @@ class MedicineDetailsFragment : Fragment() {
     var selectedCategoryIdsList = mutableListOf<Pair<String, String>>()
     var showCategoryAdapter:ShowCategoryAdapter?=null
     var imageSource:String?=null
+    var medicinId:String?=null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -73,6 +74,7 @@ class MedicineDetailsFragment : Fragment() {
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
+            medicinId=it.getString("medicineId")
         }
 //        This ensures that fetchMedicineDetails() is only called when medicineId is not null.
         arguments?.getString("medicineId")?.let { fetchMedicineDetails(it) } ?: return
@@ -226,22 +228,41 @@ class MedicineDetailsFragment : Fragment() {
                 expiryDate = binding.etExpiryDate.text.toString()
             )
         )
-
-        db.collection("medicines").add(medicineModel)
-            .addOnSuccessListener {
-                binding.loader.visibility = View.GONE
-                Handler(Looper.getMainLooper()).post {
-                    if (isAdded) {
-                        findNavController().popBackStack()
-                        Toast.makeText(requireContext(), "Medicine Added", Toast.LENGTH_SHORT).show()
+        if (medicinId != null){
+//            update item code
+            db.collection(medicines).document(medicinId!!).set(medicineModel)
+                .addOnSuccessListener {
+                    binding.loader.visibility = View.GONE
+                    Handler(Looper.getMainLooper()).post {
+                        if (isAdded) {
+                            findNavController().popBackStack()
+                            Toast.makeText(requireContext(), "Medicine Updated", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
-            }
-            .addOnFailureListener {
-                binding.loader.visibility = View.GONE
-                binding.saveMed.isClickable = true
-                Toast.makeText(mainActivity, "Failed to add medicine", Toast.LENGTH_SHORT).show()
-            }
+                .addOnFailureListener {
+                    binding.loader.visibility = View.GONE
+                    binding.saveMed.isClickable = true
+                    Toast.makeText(mainActivity, "Failed to update medicine", Toast.LENGTH_SHORT).show()
+                }
+        }
+        else{
+            db.collection(medicines).add(medicineModel)
+                .addOnSuccessListener {
+                    binding.loader.visibility = View.GONE
+                    Handler(Looper.getMainLooper()).post {
+                        if (isAdded) {
+                            findNavController().popBackStack()
+                            Toast.makeText(requireContext(), "Medicine Added", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                .addOnFailureListener {
+                    binding.loader.visibility = View.GONE
+                    binding.saveMed.isClickable = true
+                    Toast.makeText(mainActivity, "Failed to add medicine", Toast.LENGTH_SHORT).show()
+                }
+        }
     }
     private fun openImagePicker() {
         val intent = Intent(Intent.ACTION_PICK).apply {
@@ -272,8 +293,9 @@ class MedicineDetailsFragment : Fragment() {
 //        add krliya hai but ui pr set karana hai.
         imageSource=medicine.medicineImg
     }
+
     private fun fetchMedicineDetails(medicineId: String) {
-        Firebase.firestore.collection("medicines").document(medicineId)
+        Firebase.firestore.collection(medicines).document(medicineId)
             .get()
             .addOnSuccessListener { document ->
                 val medicine = document.toObject(MedicineModel::class.java)

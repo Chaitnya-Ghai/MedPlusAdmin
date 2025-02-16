@@ -102,29 +102,36 @@ class MedicinesFragment : Fragment() {
             }
         })
         binding.loader.visibility = View.VISIBLE // Show loader while fetching data
-        medicineList.clear()
-        db.collection(medicines).addSnapshotListener { snapshots, e ->
-            if (e != null) return@addSnapshotListener
+        db.collection("medicines").addSnapshotListener { snapshots, e ->
+            if (e != null) {
+                Log.e("Firestore", "Error fetching data: ${e.message}")
+                return@addSnapshotListener
+            }
             for (snapshot in snapshots!!.documentChanges) {
                 val model = convertMedicineObject(snapshot.document)
                 when (snapshot.type) {
                     DocumentChange.Type.ADDED -> {
-                        medicineList.add(model)
-                    }
-                    DocumentChange.Type.REMOVED -> {
-                        val index = getIndex(model)
-                        if (index > -1) medicineList.removeAt(index)
+                        if (!medicineList.any { it.id == model.id }) { // ✅ Prevents duplicates
+                            medicineList.add(model)
+                        }
                     }
                     DocumentChange.Type.MODIFIED -> {
                         val index = getIndex(model)
-                        if (index > -1) medicineList[index] = model
+                        if (index != -1) {
+                            medicineList[index] = model
+                        }
+                    }
+                    DocumentChange.Type.REMOVED -> {
+                        val index = getIndex(model)
+                        if (index != -1) {
+                            medicineList.removeAt(index) // ✅ Removes only the deleted item
+                        }
                     }
                 }
-                binding.MedicinesRv.adapter?.notifyDataSetChanged()
             }
-            binding.loader.visibility = View.GONE // Hide loader after updating list
+            binding.MedicinesRv.adapter?.notifyDataSetChanged() // Updates only necessary changes
+            binding.loader.visibility = View.GONE
         }
-
         binding.addMedicine.setOnClickListener {
             findNavController().navigate(R.id.action_medicinesFragment_to_medicineDetailsFragment)
         }
@@ -132,7 +139,6 @@ class MedicinesFragment : Fragment() {
     private fun getIndex(model: MedicineModel): Int {
         return medicineList.indexOfFirst { it.id == model.id }
     }
-
     companion object {
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
