@@ -64,6 +64,9 @@
         <action
             android:id="@+id/action_filterMedicinesFragment_to_showSingleMedicineFragment"
             app:destination="@id/showSingleMedicineFragment" />
+        <action
+            android:id="@+id/action_filterMedicinesFragment_to_medicineDetailsFragment"
+            app:destination="@id/medicineDetailsFragment" />
     </fragment>
     <fragment
         android:id="@+id/showSingleMedicineFragment"

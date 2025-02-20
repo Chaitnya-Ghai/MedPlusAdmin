@@ -112,8 +112,7 @@ private var categoryPairsList = mutableListOf<Pair<String,String>>()//list of ca
                         }
                         ClickType.onClick ->{
                             val bundle=Bundle()
-                            bundle.putString("categorySelected",
-                                GsonBuilder().create().toJson(categoryPairsList[position]))
+                            bundle.putString("categoryId",categoryPairsList[position].first)
                             Toast.makeText(mainActivity, "${categoryPairsList[position].second} is clicked", Toast.LENGTH_SHORT).show()
                             findNavController().navigate(R.id.action_categoriesFragment_to_filterMedicinesFragment,bundle)
                         }

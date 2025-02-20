@@ -74,7 +74,7 @@ class MedicinesFragment : Fragment() {
                         AlertDialog.Builder(mainActivity).apply {
                             setTitle("Are you sure?")
                             setPositiveButton("Delete") { _, _ ->
-                                db.collection("medicines").document(model.id!!).delete()
+                                db.collection(medicines).document(model.id!!).delete()
                                     .addOnSuccessListener {
                                         medicineList.remove(model)
                                         binding.MedicinesRv.adapter?.notifyDataSetChanged() // Force update UI
@@ -102,7 +102,7 @@ class MedicinesFragment : Fragment() {
             }
         })
         binding.loader.visibility = View.VISIBLE // Show loader while fetching data
-        db.collection("medicines").addSnapshotListener { snapshots, e ->
+        db.collection(medicines).addSnapshotListener { snapshots, e ->
             if (e != null) {
                 Log.e("Firestore", "Error fetching data: ${e.message}")
                 return@addSnapshotListener
