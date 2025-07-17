@@ -16,7 +16,7 @@ import com.google.firebase.auth.FirebaseAuth
 
 class AdminLogin : AppCompatActivity() {
     val binding by lazy { ActivityAdminLoginBinding.inflate(layoutInflater) }
-    val auth by lazy { FirebaseAuth.getInstance() }
+    private val auth by lazy { FirebaseAuth.getInstance() }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

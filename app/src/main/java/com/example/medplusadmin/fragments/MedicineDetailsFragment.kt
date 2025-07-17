@@ -36,6 +36,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.jan.supabase.storage.storage
 import io.github.jan.supabase.storage.uploadAsFlow
+import io.ktor.util.toLowerCasePreservingASCIIRules
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -211,7 +212,7 @@ class MedicineDetailsFragment : Fragment() {
         binding.saveMed.isClickable = false
 
         val medicineModel = MedicineModel(
-            medicineName = binding.etMedName.text.toString(),
+            medicineName = binding.etMedName.text.toString().toLowerCasePreservingASCIIRules(),
             medicineImg = imageSource,
             description = binding.etDescription.text.toString(),
             ingredients = binding.etIngredients.text.toString(),

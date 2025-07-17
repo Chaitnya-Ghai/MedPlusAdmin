@@ -1,5 +1,6 @@
 package com.example.medplusadmin.fragments
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
@@ -32,7 +33,6 @@ import com.example.medplusadmin.uriToByteArray
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.firestore
-import com.google.gson.GsonBuilder
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.jan.supabase.storage.storage
@@ -40,17 +40,13 @@ import io.github.jan.supabase.storage.uploadAsFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [CategoriesFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class CategoriesFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
@@ -89,6 +85,7 @@ private var categoryPairsList = mutableListOf<Pair<String,String>>()//list of ca
         return binding.root
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.categoryBtn
@@ -212,9 +209,10 @@ private var categoryPairsList = mutableListOf<Pair<String,String>>()//list of ca
         binding.loader.visibility=View.VISIBLE
         customDialogBinding.saveBtn.visibility=View.GONE
         if (position>-1){
+            customDialogBinding.name.text.toString()
             val data = CategoryModel(
                 id = categoryArray[position].id,
-                categoryName = customDialogBinding.name.text.toString(),
+                categoryName = customDialogBinding.name.text.toString().lowercase(Locale.ROOT),
                 imageUrl = url
             )
             db.collection(collectionName).document(categoryArray[position].id!!).set(data).addOnCompleteListener{
@@ -233,7 +231,8 @@ private var categoryPairsList = mutableListOf<Pair<String,String>>()//list of ca
         }
         else{
             val data = CategoryModel(
-                categoryName = customDialogBinding.name.text.toString(),
+                id = db.collection(collectionName).document().id,
+                categoryName = customDialogBinding.name.text.toString().lowercase(Locale.US),
                 imageUrl = url
             )
             db.collection(collectionName).add(data).addOnCompleteListener{
@@ -304,24 +303,5 @@ private var categoryPairsList = mutableListOf<Pair<String,String>>()//list of ca
             type = "image/*"  // Filter for image files , file kai access bhi es le skte hai
         }
         imagePickerLauncher.launch(intent)  // Launch the image picker
-    }
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment CategoriesFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            CategoriesFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
     }
 }

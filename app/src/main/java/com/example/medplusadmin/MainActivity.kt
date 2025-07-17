@@ -30,11 +30,11 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 
 class MainActivity : AppCompatActivity() {
-    val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
     private lateinit var appBarConfiguration:AppBarConfiguration
-    lateinit var navController: NavController
+    private lateinit var navController: NavController
     private val firestore=Firebase.firestore
 //    permissions
     private val PERMISSION_REQUEST_CODE = 100
