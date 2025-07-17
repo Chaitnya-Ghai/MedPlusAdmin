@@ -1,7 +1,7 @@
 package com.example.medplusadmin.dataClasses
 
 data class MedicineModel(
-    var id :String?=null,
+    var medId :String?=null,
     var medicineName :String?=null,
     var description :String?=null,
     var medicineImg :String?=null,
