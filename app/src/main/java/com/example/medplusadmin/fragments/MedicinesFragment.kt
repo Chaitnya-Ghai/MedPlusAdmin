@@ -8,10 +8,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.medplusadmin.Constants.Companion.medicines
 import com.example.medplusadmin.MainActivity
 import com.example.medplusadmin.R
@@ -74,7 +72,7 @@ class MedicinesFragment : Fragment() {
                         AlertDialog.Builder(mainActivity).apply {
                             setTitle("Are you sure?")
                             setPositiveButton("Delete") { _, _ ->
-                                db.collection(medicines).document(model.id!!).delete()
+                                db.collection(medicines).document(model.medId!!).delete()
                                     .addOnSuccessListener {
                                         medicineList.remove(model)
                                         binding.MedicinesRv.adapter?.notifyDataSetChanged() // Force update UI
@@ -90,12 +88,12 @@ class MedicinesFragment : Fragment() {
                     }
                     medicineCLick.onclick->{
                         val bundle=Bundle()
-                        bundle.putString("medicineId", medicineList[position].id!!)
+                        bundle.putString("medicineId", medicineList[position].medId!!)
                         findNavController().navigate(R.id.action_medicinesFragment_to_showSingleMedicineFragment,bundle)
                     }
                     medicineCLick.update->{
                         val bundle=Bundle()
-                        bundle.putString("medicineId", medicineList[position].id!!)
+                        bundle.putString("medicineId", medicineList[position].medId!!)
                         findNavController().navigate(R.id.action_medicinesFragment_to_medicineDetailsFragment ,bundle)}
                     else->{/*NOTHING*/}
                 }
@@ -111,7 +109,7 @@ class MedicinesFragment : Fragment() {
                 val model = convertMedicineObject(snapshot.document)
                 when (snapshot.type) {
                     DocumentChange.Type.ADDED -> {
-                        if (!medicineList.any { it.id == model.id }) { // ✅ Prevents duplicates
+                        if (!medicineList.any { it.medId == model.medId }) { // ✅ Prevents duplicates
                             medicineList.add(model)
                         }
                     }
@@ -137,6 +135,6 @@ class MedicinesFragment : Fragment() {
         }
     }
     private fun getIndex(model: MedicineModel): Int {
-        return medicineList.indexOfFirst { it.id == model.id }
+        return medicineList.indexOfFirst { it.medId == model.medId }
     }
 }

@@ -13,7 +13,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot
 
 fun convertMedicineObject(snapshot: QueryDocumentSnapshot): MedicineModel {
     val model = snapshot.toObject(MedicineModel::class.java)
-    model.id = snapshot.id ?: ""
+    model.medId = snapshot.id ?: ""
     return model
 }
 

@@ -15,7 +15,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toUri
-import androidx.core.view.forEach
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -212,7 +211,7 @@ class MedicineDetailsFragment : Fragment() {
         binding.saveMed.isClickable = false
 
         val medicineModel = MedicineModel(
-            id = db.collection(medicines).document().id,
+            medId = db.collection(medicines).document().id,
             medicineName = binding.etMedName.text.toString().toLowerCasePreservingASCIIRules(),
             medicineImg = imageSource,
             description = binding.etDescription.text.toString(),

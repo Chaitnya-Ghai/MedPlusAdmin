@@ -73,8 +73,8 @@ class FilterMedicinesFragment : Fragment() {
                         AlertDialog.Builder(mainActivity).apply {
                             setTitle("Are you sure?")
                             setPositiveButton("Delete") { _, _ ->
-                                if (!model.id.isNullOrEmpty()) {
-                                    db.collection(medicines).document(model.id!!)
+                                if (!model.medId.isNullOrEmpty()) {
+                                    db.collection(medicines).document(model.medId!!)
                                         .update("belongingCategory", FieldValue.arrayRemove(categoryId))
                                         .addOnSuccessListener {
                                             model.belongingCategory?.remove(categoryId) // Update local model
@@ -96,13 +96,13 @@ class FilterMedicinesFragment : Fragment() {
                     }
                     medicineCLick.onclick -> {
                         val bundle = Bundle().apply {
-                            putString("medicineId", model.id)
+                            putString("medicineId", model.medId)
                         }
                         findNavController().navigate(R.id.action_filterMedicinesFragment_to_showSingleMedicineFragment, bundle)
                     }
                     medicineCLick.update -> {
                         val bundle = Bundle().apply {
-                            putString("medicineId", model.id)
+                            putString("medicineId", model.medId)
                         }
                         findNavController().navigate(R.id.action_filterMedicinesFragment_to_medicineDetailsFragment, bundle)
                     }
