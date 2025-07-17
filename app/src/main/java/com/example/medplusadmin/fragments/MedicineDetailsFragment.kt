@@ -212,6 +212,7 @@ class MedicineDetailsFragment : Fragment() {
         binding.saveMed.isClickable = false
 
         val medicineModel = MedicineModel(
+            id = db.collection(medicines).document().id,
             medicineName = binding.etMedName.text.toString().toLowerCasePreservingASCIIRules(),
             medicineImg = imageSource,
             description = binding.etDescription.text.toString(),
