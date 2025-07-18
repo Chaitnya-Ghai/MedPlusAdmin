@@ -111,12 +111,14 @@ class AdminLogin : AppCompatActivity() {
                 p2: Int,
                 p3: Int
             ) { }
+
             override fun onTextChanged(
                 p0: CharSequence?,
                 p1: Int,
                 p2: Int,
                 p3: Int
             ) { }
+
             override fun afterTextChanged(p0: Editable?) {
                 try {
                     binding.loginCharacter.controller.setNumberState(stateMachineName,"numLook",p0!!.length.toFloat())
