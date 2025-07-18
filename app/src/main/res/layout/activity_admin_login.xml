@@ -2,56 +2,125 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".auth.AdminLogin">
-    <ProgressBar
+    android:background="#D6E2EA">
+
+    <TextView
+        android:id="@+id/welcomeText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/progessBar"
-        android:elevation="200dp"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-    <com.google.android.material.card.MaterialCardView
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="30dp"
+        android:text="Signup!"
+        android:textColor="#007BFF"
+        android:textSize="50sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvAddSalesPerson"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="40dp"
-        app:cardCornerRadius="20dp"
-        android:id="@+id/cardView"
-        app:cardElevation="20dp"
-        android:backgroundTint="#FFCCBC"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/welcomeText"
+        android:text="Login to explore the Admin app..."
+        android:textSize="20sp"
+        android:layout_marginStart="15dp"
+        android:layout_marginBottom="20dp"
+        android:layout_below="@+id/welcomeText"/>
+
+    <!--    <androidx.cardview.widget.CardView-->
+    <!--        android:id="@+id/illustration"-->
+    <!--        android:layout_width="0dp"-->
+    <!--        android:layout_height="0dp"-->
+    <!--        android:layout_margin="30dp"-->
+    <!--        app:cardCornerRadius="10dp"-->
+    <!--        app:cardElevation="20dp"-->
+    <!--        app:layout_constraintBottom_toTopOf="@id/username_layout"-->
+    <!--        app:layout_constraintDimensionRatio="1:1"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@id/tvAddSalesPerson">-->
+    <app.rive.runtime.kotlin.RiveAnimationView
+        android:id="@+id/loginCharacter"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="30dp"
+        app:layout_constraintBottom_toTopOf="@id/username_layout"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
-        <LinearLayout
+        app:layout_constraintTop_toBottomOf="@id/tvAddSalesPerson"
+        app:riveResource="@raw/animated_login_character" />
+    <!--    </androidx.cardview.widget.CardView>-->
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/username_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="32dp"
+        android:hint="Email"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/loginCharacter">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etEmail"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="18dp"
-                android:hint="enter your email"
-                android:id="@+id/emailEt"/>
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="18dp"
-                android:inputType="textPassword"
-                android:hint="/password"
-                android:id="@+id/passwordEt"/>
-            <com.google.android.material.button.MaterialButton
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#BA1430"
-                android:layout_margin="8dp"
-                android:text="login"
-                android:id="@+id/Login"/>
+            android:layout_height="wrap_content"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-        </LinearLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/password_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:hint="Password"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/username_layout">
 
-    </com.google.android.material.card.MaterialCardView>
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:drawableEnd="@drawable/ic_eye"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:text="Login"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="70dp"
+        android:backgroundTint="#007BFF"
+        app:cornerRadius="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/password_layout" />
+    <!--    <LinearLayout-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:id="@+id/pgBar"-->
+    <!--        android:visibility="gone"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/forgot_password_text"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        android:gravity="center">-->
+    <!--        <ProgressBar-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"/>-->
+    <!--    </LinearLayout>-->
+
 </androidx.constraintlayout.widget.ConstraintLayout>

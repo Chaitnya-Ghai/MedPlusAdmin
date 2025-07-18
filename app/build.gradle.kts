@@ -62,4 +62,10 @@ dependencies {
     annotationProcessor("com.github.bumptech.glide:compiler:4.11.0")
 //    Gson dependencies
     implementation("com.google.code.gson:gson:2.11.0")
+
+    //Rive Dependencies
+    implementation ("app.rive:rive-android:9.6.5")
+    // During initialization, you may need to add a dependency
+    // for Jetpack Startup
+    implementation ("androidx.startup:startup-runtime:1.1.1")
 }
