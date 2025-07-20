@@ -2,7 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
+    id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
 }
+
 
 android {
     namespace = "com.example.medplusadmin"
@@ -14,8 +17,24 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
+        buildFeatures {
+            buildConfig = true
+        }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "SUPABASE_URL",
+            "\"${project.findProperty("SUPABASE_URL") ?: ""}\""
+        )
+
+        buildConfigField(
+            "String",
+            "SUPABASE_API_KEY",
+            "\"${project.findProperty("SUPABASE_API_KEY") ?: ""}\""
+        )
+
+
     }
 
     buildTypes {
@@ -68,4 +87,13 @@ dependencies {
     // During initialization, you may need to add a dependency
     // for Jetpack Startup
     implementation ("androidx.startup:startup-runtime:1.1.1")
+    // MVVM
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+// Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
+// hilt
+    implementation("com.google.dagger:hilt-android:2.56.1")
+    ksp("com.google.dagger:hilt-android-compiler:2.56.1")
 }
