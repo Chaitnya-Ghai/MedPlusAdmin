@@ -6,7 +6,7 @@
     android:background="@color/bg"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".Presentation.screens.activities.MainActivity">
     <fragment
         android:layout_width="match_parent"
         android:layout_height="match_parent"
