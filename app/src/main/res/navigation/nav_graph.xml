@@ -6,7 +6,7 @@
     app:startDestination="@id/manageUsersFragment">
     <fragment
         android:id="@+id/manageUsersFragment"
-        android:name="com.example.medplusadmin.Presentation.screens.fragments.ManageUsersFragment"
+        android:name="com.example.medplusadmin.presentation.screens.fragments.ManageUsersFragment"
         android:label="Active Users"
         tools:layout="@layout/fragment_manage_users" >
         <action
@@ -21,7 +21,7 @@
     </fragment>
     <fragment
         android:id="@+id/categoriesFragment"
-        android:name="com.example.medplusadmin.Presentation.screens.fragments.CategoriesFragment"
+        android:name="com.example.medplusadmin.presentation.screens.fragments.CategoriesFragment"
         android:label="Categories"
         tools:layout="@layout/fragment_categories" >
         <action
@@ -33,7 +33,7 @@
     </fragment>
     <fragment
         android:id="@+id/medicinesFragment"
-        android:name="com.example.medplusadmin.Presentation.screens.fragments.MedicinesFragment"
+        android:name="com.example.medplusadmin.presentation.screens.fragments.MedicinesFragment"
         android:label="Medicines"
         tools:layout="@layout/fragment_medicines" >
         <action
@@ -48,17 +48,17 @@
     </fragment>
     <fragment
         android:id="@+id/dashboardFragment"
-        android:name="com.example.medplusadmin.Presentation.screens.fragments.DashboardFragment"
+        android:name="com.example.medplusadmin.presentation.screens.fragments.DashboardFragment"
         android:label="Dashboard"
         tools:layout="@layout/fragment_dashboard" />
     <fragment
         android:id="@+id/medicineDetailsFragment"
-        android:name="com.example.medplusadmin.Presentation.screens.fragments.MedicineDetailsFragment"
+        android:name="com.example.medplusadmin.presentation.screens.fragments.MedicineDetailsFragment"
         android:label="fragment_medicine_details"
         tools:layout="@layout/fragment_medicine_details" />
     <fragment
         android:id="@+id/filterMedicinesFragment"
-        android:name="com.example.medplusadmin.Presentation.screens.fragments.FilterMedicinesFragment"
+        android:name="com.example.medplusadmin.presentation.screens.fragments.FilterMedicinesFragment"
         android:label="fragment_filter_medicines"
         tools:layout="@layout/fragment_filter_medicines" >
         <action
@@ -70,7 +70,7 @@
     </fragment>
     <fragment
         android:id="@+id/showSingleMedicineFragment"
-        android:name="com.example.medplusadmin.Presentation.screens.fragments.ShowSingleMedicineFragment"
+        android:name="com.example.medplusadmin.presentation.screens.fragments.ShowSingleMedicineFragment"
         android:label="fragment_show_single_medicine"
         tools:layout="@layout/fragment_show_single_medicine" />
 </navigation>

@@ -24,7 +24,7 @@
         android:theme="@style/Theme.MedPlusAdmin"
         tools:targetApi="31">
         <activity
-            android:name=".Presentation.screens.activities.SplashScreen"
+            android:name=".presentation.screens.activities.SplashScreen"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,10 +33,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Presentation.screens.activities.AdminLogin"
+            android:name=".presentation.screens.activities.AdminLogin"
             android:exported="false" />
         <activity
-            android:name=".Presentation.screens.activities.MainActivity"
+            android:name=".presentation.screens.activities.MainActivity"
             android:exported="true">
         </activity>
 
