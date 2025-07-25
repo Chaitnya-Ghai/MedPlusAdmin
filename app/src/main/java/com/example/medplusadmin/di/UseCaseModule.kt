@@ -1,23 +1,40 @@
 package com.example.medplusadmin.di
 
 import com.example.medplusadmin.domain.repository.CatalogRepository
-import com.example.medplusadmin.domain.usecases.catalog.GetAllMedicinesUseCase
+import com.example.medplusadmin.domain.usecases.catalog.DeleteCategoryUseCase
+import com.example.medplusadmin.domain.usecases.catalog.GetAllCategoriesUseCase
+import com.example.medplusadmin.domain.usecases.catalog.UpsertCategoriesUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.android.scopes.ViewModelScoped
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 object UseCaseModule {
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun provideGetAllMedicinesUseCase(
         catalogRepository: CatalogRepository
-    ): GetAllMedicinesUseCase {
-        return GetAllMedicinesUseCase(catalogRepository)
+    ): GetAllCategoriesUseCase {
+        return GetAllCategoriesUseCase(catalogRepository)
+    }
+
+    @Provides
+    @ViewModelScoped
+    fun provideDeleteCategoryUseCase(
+        catalogRepository: CatalogRepository
+    ) : DeleteCategoryUseCase{
+        return DeleteCategoryUseCase(catalogRepository)
+    }
+
+    @Provides
+    fun provideUpsertCategoryUseCase(
+        catalogRepository: CatalogRepository
+    ) : UpsertCategoriesUseCase{
+        return UpsertCategoriesUseCase(catalogRepository)
     }
 
 }

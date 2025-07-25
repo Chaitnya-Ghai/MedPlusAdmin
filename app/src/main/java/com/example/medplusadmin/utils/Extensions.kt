@@ -1,15 +1,28 @@
 package com.example.medplusadmin.utils
 
 import android.net.Uri
-import com.example.medplusadmin.Presentation.screens.activities.MainActivity
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.example.medplusadmin.presentation.screens.activities.MainActivity
 import com.example.medplusadmin.domain.models.Category
 import com.example.medplusadmin.domain.models.Medicine
 import com.google.firebase.firestore.QueryDocumentSnapshot
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
- fun convertCategoryObject(snapshot: QueryDocumentSnapshot): Category {
-    val model = snapshot.toObject(Category::class.java)
-    model.id = snapshot.id ?: ""
-    return model
+
+inline fun Fragment.collectFlowSafely(
+    state: Lifecycle.State = Lifecycle.State.STARTED,
+    crossinline block: suspend () -> Unit
+) {
+    viewLifecycleOwner.lifecycleScope.launch {
+        viewLifecycleOwner.lifecycle.repeatOnLifecycle(state) {
+            block()
+        }
+    }
 }
 
 fun convertMedicineObject(snapshot: QueryDocumentSnapshot): Medicine {
@@ -18,7 +31,7 @@ fun convertMedicineObject(snapshot: QueryDocumentSnapshot): Medicine {
     return model
 }
 
-fun uriToByteArray(mainActivity: MainActivity, uri: Uri): ByteArray {
-    val inputStream = mainActivity.contentResolver.openInputStream(uri)
+fun uriToByteArray(mainActivity: MainActivity?, uri: Uri): ByteArray {
+    val inputStream = mainActivity?.contentResolver?.openInputStream(uri)
     return inputStream?.readBytes() ?: ByteArray(0)
 }
