@@ -1,28 +1,49 @@
 package com.example.medplusadmin.utils
 
+import android.content.Context
 import android.net.Uri
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.example.medplusadmin.presentation.screens.activities.MainActivity
-import com.example.medplusadmin.domain.models.Category
 import com.example.medplusadmin.domain.models.Medicine
 import com.google.firebase.firestore.QueryDocumentSnapshot
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 
-
+/**
+ * Collects a flow safely within the Fragment's lifecycle.
+ */
 inline fun Fragment.collectFlowSafely(
+    handler: CoroutineExceptionHandler,
     state: Lifecycle.State = Lifecycle.State.STARTED,
     crossinline block: suspend () -> Unit
 ) {
-    viewLifecycleOwner.lifecycleScope.launch {
+    viewLifecycleOwner.lifecycleScope.launch(handler) {
         viewLifecycleOwner.lifecycle.repeatOnLifecycle(state) {
             block()
         }
     }
+}
+
+/*Show a Toast from a Fragment.*/
+fun Fragment.showToast(message: String) {
+    context?.showToast(message)
+}
+
+/*Show a Toast from any Context.*/
+fun Context.showToast(message: String) {
+    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+}
+
+/*Convert a content URI to a ByteArray safely.*/
+fun uriToByteArray(context: Context?, uri: Uri): ByteArray {
+    if (context == null) return ByteArray(0)
+
+    return context.contentResolver.openInputStream(uri)?.use { inputStream ->
+        inputStream.readBytes()
+    } ?: ByteArray(0)
 }
 
 fun convertMedicineObject(snapshot: QueryDocumentSnapshot): Medicine {
@@ -31,7 +52,3 @@ fun convertMedicineObject(snapshot: QueryDocumentSnapshot): Medicine {
     return model
 }
 
-fun uriToByteArray(mainActivity: MainActivity?, uri: Uri): ByteArray {
-    val inputStream = mainActivity?.contentResolver?.openInputStream(uri)
-    return inputStream?.readBytes() ?: ByteArray(0)
-}

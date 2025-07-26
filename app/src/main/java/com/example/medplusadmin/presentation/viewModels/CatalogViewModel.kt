@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,7 +31,27 @@ class CatalogViewModel @Inject constructor(
     // ------------------- CATEGORY -------------------
 
     val categories = getAllCategoriesUseCase().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Resource.Loading())
-
+    /* Searching*/
+    private val _searchQueryCategory = MutableStateFlow("")//used flow for better debounce operator usage
+    fun updateSearchQuery(query: String) { _searchQueryCategory.value = query }
+    val filteredCategories = combine(_searchQueryCategory.debounce(300L), categories) { query, result ->
+        // Initially set loading
+        if (result is Resource.Loading) {
+            Resource.Loading()
+        } else if (result is Resource.Error) {
+            Resource.Error(result.message.toString())
+        } else if (result is Resource.Success) {
+            val list = result.data ?: emptyList()
+            val filtered = if (query.isBlank()) list else list.filter {
+                it.categoryName.contains(query, ignoreCase = true) ||
+                        it.id.contains(query, ignoreCase = true)
+            }
+            Resource.Success(filtered)
+        } else {
+            Resource.Success(emptyList()) // default fallback
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Loading())
+    /* Upsert -> Add or Update*/
     private val _upsertCategoryState = MutableStateFlow<Resource<Boolean>>(Resource.Loading())
     val upsertCategoryState: StateFlow<Resource<Boolean>> = _upsertCategoryState
 
