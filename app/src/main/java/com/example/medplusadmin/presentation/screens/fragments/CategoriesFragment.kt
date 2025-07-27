@@ -42,6 +42,7 @@ import io.github.jan.supabase.storage.storage
 import io.github.jan.supabase.storage.uploadAsFlow
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
@@ -52,7 +53,7 @@ private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
 @AndroidEntryPoint
-class CategoriesFragment @Inject constructor() : Fragment() {
+class CategoriesFragment: Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     @Inject
@@ -128,9 +129,9 @@ class CategoriesFragment @Inject constructor() : Fragment() {
 
                                     if (result is Resource.Success) {
                                         Log.e("DeleteCategory", "Successfully deleted: $deletedItem")
-                                       /* // Optionally show a toast// */ Toast.makeText(mainActivity, "${deletedItem.categoryName} deleted", Toast.LENGTH_SHORT).show()
+                                       mainActivity.showToast("${deletedItem.categoryName} deleted")
                                     } else {
-                                        Toast.makeText(context, "Failed to delete", Toast.LENGTH_SHORT).show()
+                                        mainActivity.showToast( "Failed to delete")
                                     }
                                 }
 
@@ -222,18 +223,14 @@ class CategoriesFragment @Inject constructor() : Fragment() {
         binding.categoryBtn.setOnClickListener {
             openDialog()
         }
-        lifecycleScope.launchWhenStarted {
-            catalogViewModel.uiEvent.collect { event ->
-                when (event) {
-                    is CatalogUIEvent.OpenCategoryImagePicker -> openImagePicker() // In CategoriesFragment
-                    is CatalogUIEvent.OpenMedicineImagePicker -> openImagePicker() // In MedicineFragment
-                }
-            }
+//        inline fun <reified T> Flow<*>.filterIsInstance(): Flow<T>
+//        is used to filter the flow for a specific type
+        collectFlowSafely(handler) {
+            catalogViewModel.uiEvent
+                .filterIsInstance<CatalogUIEvent.OpenCategoryImagePicker>()
+                .collect { event -> openImagePicker() }
         }
-
-
     }
-
 
     private fun openDialog(position:Int = -1){
         Log.e("open dialog", "onClick: $position " )
@@ -269,9 +266,9 @@ class CategoriesFragment @Inject constructor() : Fragment() {
                     customDialogBinding.name.error="Enter Category Name"
                 }
                 else if(imageSource==null){
-                    Toast.makeText(mainActivity, "Select Image", Toast.LENGTH_SHORT).show()
+                    mainActivity.showToast( "Select Image")
                 }
-                else { /*if(imageSource !=null)*/
+                else {
                     if (imageSource!!.startsWith("http")) {
                         Log.e("img not updated ", "Image is in from a URL: $imageSource")
                         storeDataToFireStore(url = imageSource!!, position)
@@ -344,9 +341,8 @@ class CategoriesFragment @Inject constructor() : Fragment() {
     private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.data?.let { uri ->
-                // Handle the selected image URI
                 imgUri=uri
-                Toast.makeText(context, "Image selected: $uri", Toast.LENGTH_SHORT).show()
+                mainActivity.showToast( "Image selected: $uri")
                 customDialogBinding.imgDialog.setImageURI(uri)
                 imageSource = uri.toString()
             }
@@ -359,4 +355,3 @@ class CategoriesFragment @Inject constructor() : Fragment() {
         imagePickerLauncher.launch(intent)
     }
 }
-

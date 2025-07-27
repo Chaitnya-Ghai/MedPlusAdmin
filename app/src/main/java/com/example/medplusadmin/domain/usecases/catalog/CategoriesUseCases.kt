@@ -13,7 +13,6 @@ class GetAllCategoriesUseCase(
     }
 }
 
-
 class DeleteCategoryUseCase(
     private val catalogRepository: CatalogRepository
 ) {

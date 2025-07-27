@@ -3,8 +3,13 @@ package com.example.medplusadmin.presentation.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.medplusadmin.domain.models.Category
+import com.example.medplusadmin.domain.models.Medicine
 import com.example.medplusadmin.domain.usecases.catalog.DeleteCategoryUseCase
+import com.example.medplusadmin.domain.usecases.catalog.DeleteMedicineUseCase
 import com.example.medplusadmin.domain.usecases.catalog.GetAllCategoriesUseCase
+import com.example.medplusadmin.domain.usecases.catalog.GetAllMedicinesUseCase
+import com.example.medplusadmin.domain.usecases.catalog.GetMedicinesByCategoryUseCase
+import com.example.medplusadmin.domain.usecases.catalog.GetaMedicineByIdUseCase
 import com.example.medplusadmin.domain.usecases.catalog.UpsertCategoriesUseCase
 import com.example.medplusadmin.utils.CatalogUIEvent
 import com.example.medplusadmin.utils.Resource
@@ -25,7 +30,11 @@ import javax.inject.Inject
 class CatalogViewModel @Inject constructor(
     private val getAllCategoriesUseCase: GetAllCategoriesUseCase,
     private val deleteCategoryUseCase: DeleteCategoryUseCase,
-    private val upsertCategoriesUseCase: UpsertCategoriesUseCase
+    private val upsertCategoriesUseCase: UpsertCategoriesUseCase,
+    private val getAllMedicinesUseCase: GetAllMedicinesUseCase,
+    private val deleteMedicineUseCase: DeleteMedicineUseCase,
+    private val getMedicineByIdUseCase: GetaMedicineByIdUseCase,
+    private val getMedicinesByCategory: GetMedicinesByCategoryUseCase
 ) : ViewModel() {
 
     // ------------------- CATEGORY -------------------
@@ -69,8 +78,33 @@ class CatalogViewModel @Inject constructor(
 
     // ------------------- MEDICINE -------------------
 
-    // Placeholder: Add medicine-related flows and functions when needed
+    val medicines = getAllMedicinesUseCase().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Resource.Loading())
 
+    private val _searchQueryMedicines = MutableStateFlow("")//used flow for better debounce operator usage
+    fun updateSearchQueryMedicine(query: String) { _searchQueryMedicines.value = query }
+    val filteredMedicines = combine(_searchQueryMedicines.debounce(300L), medicines) { query, result ->
+        // Initially set loading
+        if (result is Resource.Loading) {
+            Resource.Loading()
+        } else if (result is Resource.Error) {
+            Resource.Error(result.message.toString())
+        } else if (result is Resource.Success) {
+            val list = result.data ?: emptyList()
+            val filtered = if (query.isBlank()) list else list.filter {
+                it.medicineName.contains(query, ignoreCase = true) ||
+                        it.medId.contains(query, ignoreCase = true) ||
+                        it.ingredients.contains(query, ignoreCase = true) ||
+                        it.belongingCategory.contains(query)
+            }
+            Resource.Success(filtered)
+        } else {
+            Resource.Success(emptyList()) // default fallback
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), Resource.Loading())
+
+    suspend fun deleteMedicine(id: String): Resource<Boolean> {
+        return deleteMedicineUseCase.invoke(id)
+    }
     // ------------------- SUPABASE IMAGE UPLOAD -------------------
 
     // private val _uploadState = MutableStateFlow<Resource<String>>(Resource.Loading())

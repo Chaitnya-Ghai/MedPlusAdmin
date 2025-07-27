@@ -2,6 +2,8 @@ package com.example.medplusadmin.data.repository
 
 import android.util.Log
 import com.example.medplusadmin.data.mappers.toCategory
+import com.example.medplusadmin.data.mappers.toDto
+import com.example.medplusadmin.data.mappers.toMedicine
 import com.example.medplusadmin.data.remote.firebaseServices.CatalogService
 import com.example.medplusadmin.domain.models.Category
 import com.example.medplusadmin.domain.models.Medicine
@@ -54,12 +56,53 @@ class CatalogRepositoryImpl @Inject constructor(
     /******************************************************
      *  Medicines Section..
      ******************************************************/
-    override suspend fun addMedicine(medicine: Medicine): Result<Unit> {
-        TODO("Not yet implemented")
+    //    ---------------------------get all medicines--------------------
+    override fun getAllMedicines(): Flow<Resource<List<Medicine>>> = flow{
+        emit(Resource.Loading())
+        try {
+            catalogService.getMedicinesFlow().map { list-> list.map { it.toMedicine()  } }
+                .collect { modelList ->
+                    emit(Resource.Success(modelList))
+                }
+        } catch (e: Exception) {
+            Log.e("GetAllMedicines", "Error: ${e.message}", e)
+            emit(Resource.Error(e.message ?: "Something went wrong"))
+        }
     }
-//    ---------------------------get all categories--------------------
-    override suspend fun getAllMedicines(): List<Medicine> {
-        TODO("Not yet implemented")
+//    ----------------------------add , update medicines --------------------
+    override suspend fun upsertMedicine(medicine: Medicine): Resource<Boolean> {
+        var upsertMedicineDto = medicine.toDto()
+        val result = catalogService.upsertMedicines(upsertMedicineDto)
+        return if (result) {
+            Resource.Success(result)
+        } else {
+            Resource.Error("Something went wrong")
+        }
     }
-//    ---------------------------get all categories--------------------
+//    ---------------------------delete medicines--------------------
+    override suspend fun deleteMedicine(id: String): Resource<Boolean> {
+        val result = catalogService.deleteMedicine(id)
+        return if (result) {
+            Resource.Success(result)
+        } else {
+            Resource.Error("Something went wrong")
+        }
+    }
+
+    /**
+     * ---------------------- RELATIONAL QUERIES ----------------------
+     */
+
+    override suspend fun getMedicineBy(
+        medId: String?,
+        catId: String?
+    ): Resource<List<Medicine>> {
+        val result = catalogService.getMedicinesBy(medId = medId, catId = catId)
+        return if (result.isNotEmpty()) {
+            Resource.Success(result)
+        } else {
+            Resource.Error("Something went wrong")
+        }
+    }
+
 }

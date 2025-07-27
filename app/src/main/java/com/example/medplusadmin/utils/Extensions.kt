@@ -46,9 +46,4 @@ fun uriToByteArray(context: Context?, uri: Uri): ByteArray {
     } ?: ByteArray(0)
 }
 
-fun convertMedicineObject(snapshot: QueryDocumentSnapshot): Medicine {
-    val model = snapshot.toObject(Medicine::class.java)
-    model.medId = snapshot.id ?: ""
-    return model
-}
 
