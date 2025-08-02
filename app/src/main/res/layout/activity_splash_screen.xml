@@ -6,7 +6,7 @@
     android:background="#D6E2EA"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Presentation.screens.activities.SplashScreen">
+    tools:context=".presentation.screens.activities.SplashScreen">
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/g_h_80"
         android:layout_width="wrap_content"
