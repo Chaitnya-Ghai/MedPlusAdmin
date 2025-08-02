@@ -13,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
@@ -32,6 +33,7 @@ import com.example.medplusadmin.presentation.viewModels.CatalogViewModel
 import com.example.medplusadmin.utils.CatalogUIEvent
 import com.example.medplusadmin.utils.Resource
 import com.example.medplusadmin.utils.collectFlowSafely
+import com.example.medplusadmin.utils.showToast
 import com.example.medplusadmin.utils.uriToByteArray
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jan.supabase.SupabaseClient
@@ -40,6 +42,7 @@ import io.github.jan.supabase.storage.storage
 import io.github.jan.supabase.storage.uploadAsFlow
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
@@ -50,7 +53,7 @@ private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
 @AndroidEntryPoint
-class CategoriesFragment @Inject constructor() : Fragment() {
+class CategoriesFragment: Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     @Inject
@@ -68,11 +71,7 @@ class CategoriesFragment @Inject constructor() : Fragment() {
     //        CoroutineExceptionHandler
     val handler = CoroutineExceptionHandler { _, exception ->
         Log.e("DeleteCategory", "Coroutine error: ${exception.localizedMessage}")
-        Toast.makeText(
-            context,
-            "Something went wrong: ${exception.localizedMessage}",
-            Toast.LENGTH_SHORT
-        ).show()
+        showToast("Something went wrong: ${exception.localizedMessage}")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,6 +94,19 @@ class CategoriesFragment @Inject constructor() : Fragment() {
     @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.searchCategory.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                catalogViewModel.updateSearchQuery(query.toString())
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                catalogViewModel.updateSearchQuery(newText.orEmpty())
+                return true // Return true to indicate change was handled
+            }
+
+        })
         // Adapter setup
         categoryAdapter = CategoryAdapter(mainActivity, categoryArray, object : CategoryInterface {
             override fun onClick(position: Int, model: Category, onClickType: ClickType?) {
@@ -117,9 +129,9 @@ class CategoriesFragment @Inject constructor() : Fragment() {
 
                                     if (result is Resource.Success) {
                                         Log.e("DeleteCategory", "Successfully deleted: $deletedItem")
-                                       /* // Optionally show a toast// */ Toast.makeText(mainActivity, "${deletedItem.categoryName} deleted", Toast.LENGTH_SHORT).show()
+                                       mainActivity.showToast("${deletedItem.categoryName} deleted")
                                     } else {
-                                        Toast.makeText(context, "Failed to delete", Toast.LENGTH_SHORT).show()
+                                        mainActivity.showToast( "Failed to delete")
                                     }
                                 }
 
@@ -147,8 +159,8 @@ class CategoriesFragment @Inject constructor() : Fragment() {
         binding.categoryRv.layoutManager = GridLayoutManager(mainActivity, 1)
         binding.categoryRv.adapter = categoryAdapter
 
-        collectFlowSafely {
-            catalogViewModel.categories.collect { state ->
+        collectFlowSafely(handler) {
+            catalogViewModel.filteredCategories.collect { state ->
                 binding.loader.visibility = View.GONE
                 categoryArray.clear()
                 when (state) {
@@ -211,18 +223,14 @@ class CategoriesFragment @Inject constructor() : Fragment() {
         binding.categoryBtn.setOnClickListener {
             openDialog()
         }
-        lifecycleScope.launchWhenStarted {
-            catalogViewModel.uiEvent.collect { event ->
-                when (event) {
-                    is CatalogUIEvent.OpenCategoryImagePicker -> openImagePicker() // In CategoriesFragment
-                    is CatalogUIEvent.OpenMedicineImagePicker -> openImagePicker() // In MedicineFragment
-                }
-            }
+//        inline fun <reified T> Flow<*>.filterIsInstance(): Flow<T>
+//        is used to filter the flow for a specific type
+        collectFlowSafely(handler) {
+            catalogViewModel.uiEvent
+                .filterIsInstance<CatalogUIEvent.OpenCategoryImagePicker>()
+                .collect { event -> openImagePicker() }
         }
-
-
     }
-
 
     private fun openDialog(position:Int = -1){
         Log.e("open dialog", "onClick: $position " )
@@ -258,9 +266,9 @@ class CategoriesFragment @Inject constructor() : Fragment() {
                     customDialogBinding.name.error="Enter Category Name"
                 }
                 else if(imageSource==null){
-                    Toast.makeText(mainActivity, "Select Image", Toast.LENGTH_SHORT).show()
+                    mainActivity.showToast( "Select Image")
                 }
-                else { /*if(imageSource !=null)*/
+                else {
                     if (imageSource!!.startsWith("http")) {
                         Log.e("img not updated ", "Image is in from a URL: $imageSource")
                         storeDataToFireStore(url = imageSource!!, position)
@@ -333,9 +341,8 @@ class CategoriesFragment @Inject constructor() : Fragment() {
     private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.data?.let { uri ->
-                // Handle the selected image URI
                 imgUri=uri
-                Toast.makeText(context, "Image selected: $uri", Toast.LENGTH_SHORT).show()
+                mainActivity.showToast( "Image selected: $uri")
                 customDialogBinding.imgDialog.setImageURI(uri)
                 imageSource = uri.toString()
             }
@@ -348,4 +355,3 @@ class CategoriesFragment @Inject constructor() : Fragment() {
         imagePickerLauncher.launch(intent)
     }
 }
-

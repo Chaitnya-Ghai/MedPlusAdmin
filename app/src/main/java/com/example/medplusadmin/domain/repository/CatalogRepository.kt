@@ -6,11 +6,14 @@ import com.example.medplusadmin.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface CatalogRepository {
-//    categories
+//  categories
     fun getAllCategories(): Flow<Resource<List<Category>>>
     suspend fun upsertCategory(category: Category): Resource<Boolean>
     suspend fun deleteCategory(id: String): Resource<Boolean>
-//    medicines
-    suspend fun addMedicine(medicine: Medicine): Result<Unit>
-    suspend fun getAllMedicines(): List<Medicine>
+//  medicines
+    fun getAllMedicines():  Flow<Resource<List<Medicine>>>
+    suspend fun upsertMedicine(medicine: Medicine): Resource<Boolean>
+    suspend fun deleteMedicine(id: String): Resource<Boolean>
+//  RELATIONAL QUERIES
+    suspend fun getMedicineBy(medId: String? = null, catId: String? = null): Resource<List<Medicine>>
 }
