@@ -7,7 +7,9 @@ import com.example.medplusadmin.domain.models.Category
 import com.example.medplusadmin.domain.models.Medicine
 import com.example.medplusadmin.utils.Constants.Companion.CATEGORY
 import com.example.medplusadmin.utils.Constants.Companion.MEDICINE
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import io.github.jan.supabase.SupabaseClient
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -66,13 +68,45 @@ class CatalogService @Inject constructor(
         }
     }
 
-    /** Delete category by its ID.*/
+    /**
+     * Deletes a category by its [id] and ensures all medicines referencing it
+     * are updated atomically in a single batch operation.
+     *
+     * Steps:
+     * 1. Fetch all medicines linked to the category.
+     * 2. Create a Firestore batch.
+     *    - Remove the category id from each medicine's `belongingCategory` field.
+     *    - Delete the category document itself in the same batch.
+     * 3. Commit the batch atomically so either all updates succeed or none do.
+     *
+     * @param id The unique identifier of the category to delete.
+     * @return true if the operation succeeds, false otherwise.
+     */
     suspend fun deleteCategory(id: String): Boolean {
         return try {
-            db.collection(CATEGORY).document(id).delete().await()
+            // Step 1: Get all medicines linked to this category
+            val medicinesSnapshot = db.collection(MEDICINE)
+                .whereArrayContains("belongingCategory", id)
+                .get()
+                .await()
+
+            // Step 2: Create a single batch for atomic updates + deletion
+            val batch = db.batch()
+            for (doc in medicinesSnapshot.documents) {
+                batch.update(doc.reference, "belongingCategory", FieldValue.arrayRemove(id))
+            }
+            // Add category -Deletion- to the same batch
+            val categoryRef = db.collection(CATEGORY).document(id)
+            batch.delete(categoryRef)
+
+            // Step 3: Commit all in one go
+            batch.commit().await()
             true
-        } catch (e: Exception){
-            Log.e("deleteCategory", "FirebaseService error = ${e.message}")
+        } catch (e: FirebaseFirestoreException) {
+            Log.e("deleteCategory", "FirebaseService error", e)
+            false
+        } catch (e: Exception) {
+            Log.e("deleteCategory", "FirebaseService error", e)
             false
         }
     }
