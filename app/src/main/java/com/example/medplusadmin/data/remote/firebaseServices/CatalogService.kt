@@ -4,17 +4,18 @@ import android.util.Log
 import com.example.medplusadmin.data.remote.dto.CategoryDto
 import com.example.medplusadmin.data.remote.dto.MedicineDto
 import com.example.medplusadmin.domain.models.Category
-import com.example.medplusadmin.domain.models.Medicine
 import com.example.medplusadmin.utils.Constants.Companion.CATEGORY
 import com.example.medplusadmin.utils.Constants.Companion.MEDICINE
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import io.github.jan.supabase.SupabaseClient
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -134,23 +135,25 @@ class CatalogService @Inject constructor(
      * If `id` is empty → create new medicine.
      * Else → update the existing medicine.
      */
-    suspend fun upsertMedicines(medicine: MedicineDto): Boolean {
-        return try {
+    suspend fun upsertMedicines(medicine: MedicineDto): Boolean = withContext(Dispatchers.IO) {
+        try {
             if (medicine.id.isNullOrEmpty()) {
-                // Check if medicine with same name already exists
                 val existing = db.collection(MEDICINE)
                     .whereEqualTo("medicineName", medicine.medicineName)
                     .get()
                     .await()
-
-                if (!existing.isEmpty) return false
-
-                // Create new document
+                if (!existing.isEmpty) return@withContext false
                 val docRef = db.collection(MEDICINE).document()
-                val finalMedicine = medicine.copy(id = docRef.id)
+                // Ensure belonging categories are unique before saving
+                val uniqueBelongingCategories = medicine.belongingCategory?.distinct()?.toMutableList()
+                    ?: mutableListOf()
+
+                val finalMedicine = medicine.copy(
+                    id = docRef.id ,
+                    belongingCategory = uniqueBelongingCategories
+                )
                 docRef.set(finalMedicine).await()
             } else {
-                // Update existing medicine
                 db.collection(MEDICINE)
                     .document(medicine.id!!)
                     .set(medicine)
@@ -177,27 +180,27 @@ class CatalogService @Inject constructor(
     /**
      * ---------------------- RELATIONAL QUERIES ----------------------
      */
-    suspend fun getMedicinesBy(
+    fun getMedicinesBy(
         medId: String? = null,
         catId: String? = null
-    ): List<Medicine> {
-        return try {
-            val query = when {
-                medId != null -> db.collection(MEDICINE)
-                    .whereEqualTo("medId", medId)
+    ): Flow<List<MedicineDto>> = callbackFlow {
+        val query = when {
+            medId != null -> db.collection(MEDICINE)
+                .whereEqualTo("id", medId)
 
-                catId != null -> db.collection(MEDICINE)
-                    .whereArrayContains("belongingCategory", catId)
+            catId != null -> db.collection(MEDICINE)
+                .whereArrayContains("belongingCategory", catId)
 
-                else -> return emptyList()
-            }
-
-            val snapshot = query.get().await()
-            snapshot.documents.mapNotNull { it.toObject(Medicine::class.java) }
-
-        } catch (e: Exception) {
-            Log.e("FirebaseService", "getMedicinesBy error = ${e.message}")
-            emptyList()
+            else -> db.collection(MEDICINE)
         }
+        val listener= query.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                close(error) // close flow on error
+                return@addSnapshotListener
+            }
+            val medicines = snapshot?.toObjects(MedicineDto::class.java) ?: emptyList()
+            trySend(medicines).isSuccess
+        }
+        awaitClose { listener.remove() }
     }
 }

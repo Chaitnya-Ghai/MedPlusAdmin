@@ -32,12 +32,12 @@ class UpsertMedicinesUseCse(
 class GetaMedicineByIdUseCase(
     private val catalogRepository: CatalogRepository
 ) {
-    suspend operator fun invoke(medId: String): Resource<List<Medicine>> = catalogRepository.getMedicineBy(medId = medId)
+    operator fun invoke(medId: String): Flow<Resource<List<Medicine>>> = catalogRepository.getMedicineBy(medId = medId)
 }
 
 class GetMedicinesByCategoryUseCase(
     private val catalogRepository: CatalogRepository
 ) {
-    suspend operator fun invoke(catId: String): Resource<List<Medicine>> = catalogRepository.getMedicineBy( catId = catId)
+    operator fun invoke(catId: String): Flow<Resource<List<Medicine>>> = catalogRepository.getMedicineBy( catId = catId)
 }
 

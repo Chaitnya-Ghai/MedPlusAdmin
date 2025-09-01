@@ -32,7 +32,8 @@ import com.example.medplusadmin.presentation.interfaces.ClickType
 import com.example.medplusadmin.presentation.viewModels.CatalogViewModel
 import com.example.medplusadmin.utils.CatalogUIEvent
 import com.example.medplusadmin.utils.Resource
-import com.example.medplusadmin.utils.collectFlowSafely
+import com.example.medplusadmin.utils.collectWithLifecycle
+import com.example.medplusadmin.utils.collectSafelyWithFlow
 import com.example.medplusadmin.utils.showToast
 import com.example.medplusadmin.utils.uriToByteArray
 import dagger.hilt.android.AndroidEntryPoint
@@ -159,42 +160,40 @@ class CategoriesFragment: Fragment() {
         binding.categoryRv.layoutManager = GridLayoutManager(mainActivity, 1)
         binding.categoryRv.adapter = categoryAdapter
 
-        collectFlowSafely(handler) {
-            catalogViewModel.filteredCategories.collect { state ->
-                binding.loader.visibility = View.GONE
-                categoryArray.clear()
-                when (state) {
-                    is Resource.Loading -> {
-                        binding.loader.visibility = View.VISIBLE
-                    }
+        collectSafelyWithFlow(catalogViewModel.filteredCategories, handler) { state ->
+            binding.loader.visibility = View.GONE
+            categoryArray.clear()
+            when (state) {
+                is Resource.Loading -> {
+                    binding.loader.visibility = View.VISIBLE
+                }
 
-                    is Resource.Success -> {
-                        binding.loader.visibility = View.GONE
-                        val data = state.data
+                is Resource.Success -> {
+                    binding.loader.visibility = View.GONE
+                    val data = state.data
 
-                        if (!data.isNullOrEmpty()) {
-                            categoryArray.addAll(data)
-                            Log.d("CategoryFragment", "Fetched ${categoryArray.size} categories.")
+                    if (!data.isNullOrEmpty()) {
+                        categoryArray.addAll(data)
+                        Log.d("CategoryFragment", "Fetched ${categoryArray.size} categories.")
 
-                            categoryPairsList.clear()
-                            categoryArray.forEach {
-                                categoryPairsList.add(it.id.toString() to it.categoryName.toString())
-                            }
-                        } else {
-                            Log.e("CategoryFragment", "No categories found.")
+                        categoryPairsList.clear()
+                        categoryArray.forEach {
+                            categoryPairsList.add(it.id to it.categoryName)
                         }
-
-                        categoryAdapter.notifyDataSetChanged()
+                    } else {
+                        Log.e("CategoryFragment", "No categories found.")
                     }
 
-                    is Resource.Error -> {
-                        binding.loader.visibility = View.GONE
-                        Toast.makeText(
-                            requireContext(),
-                            state.message ?: "Unknown Error",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                    categoryAdapter.notifyDataSetChanged()
+                }
+
+                is Resource.Error -> {
+                    binding.loader.visibility = View.GONE
+                    Toast.makeText(
+                        requireContext(),
+                        state.message ?: "Unknown Error",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
@@ -225,7 +224,7 @@ class CategoriesFragment: Fragment() {
         }
 //        inline fun <reified T> Flow<*>.filterIsInstance(): Flow<T>
 //        is used to filter the flow for a specific type
-        collectFlowSafely(handler) {
+        collectWithLifecycle(handler) {
             catalogViewModel.uiEvent
                 .filterIsInstance<CatalogUIEvent.OpenCategoryImagePicker>()
                 .collect { event -> openImagePicker() }
