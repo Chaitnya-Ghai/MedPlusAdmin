@@ -7,15 +7,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.example.medplusadmin.domain.models.Medicine
-import com.google.firebase.firestore.QueryDocumentSnapshot
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 /**
  * Collects a flow safely within the Fragment's lifecycle.
  */
-inline fun Fragment.collectFlowSafely(
+inline fun Fragment.collectWithLifecycle(
     handler: CoroutineExceptionHandler,
     state: Lifecycle.State = Lifecycle.State.STARTED,
     crossinline block: suspend () -> Unit
@@ -26,6 +25,19 @@ inline fun Fragment.collectFlowSafely(
         }
     }
 }
+inline fun <T> Fragment.collectSafelyWithFlow(
+    flow: Flow<T>,
+    handler: CoroutineExceptionHandler,
+    state: Lifecycle.State = Lifecycle.State.STARTED,
+    crossinline collector: suspend (T) -> Unit
+) {
+    viewLifecycleOwner.lifecycleScope.launch(handler) {
+        viewLifecycleOwner.lifecycle.repeatOnLifecycle(state) {
+            flow.collect { collector(it) }
+        }
+    }
+}
+
 
 /*Show a Toast from a Fragment.*/
 fun Fragment.showToast(message: String) {

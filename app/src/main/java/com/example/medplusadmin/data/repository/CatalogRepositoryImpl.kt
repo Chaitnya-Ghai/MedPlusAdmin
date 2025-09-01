@@ -35,7 +35,7 @@ class CatalogRepositoryImpl @Inject constructor(
             emit(Resource.Error(e.message ?: "Something went wrong"))
         }
     }
-//    ---------------------------add , update categories--------------------
+//    ---------------------------add , update categories -----------------------
     override suspend fun upsertCategory(category: Category): Resource<Boolean> {
     val result = catalogService.upsertCategory(category)
     return if (result) {
@@ -71,7 +71,7 @@ class CatalogRepositoryImpl @Inject constructor(
     }
 //    ----------------------------add , update medicines --------------------
     override suspend fun upsertMedicine(medicine: Medicine): Resource<Boolean> {
-        var upsertMedicineDto = medicine.toDto()
+        val upsertMedicineDto = medicine.toDto()
         val result = catalogService.upsertMedicines(upsertMedicineDto)
         return if (result) {
             Resource.Success(result)
@@ -92,16 +92,19 @@ class CatalogRepositoryImpl @Inject constructor(
     /**
      * ---------------------- RELATIONAL QUERIES ----------------------
      */
-
-    override suspend fun getMedicineBy(
+    override fun getMedicineBy(
         medId: String?,
-        catId: String?
-    ): Resource<List<Medicine>> {
-        val result = catalogService.getMedicinesBy(medId = medId, catId = catId)
-        return if (result.isNotEmpty()) {
-            Resource.Success(result)
-        } else {
-            Resource.Error("Something went wrong")
+        catId: String?,
+    ): Flow<Resource<List<Medicine>>> = flow {
+        emit(Resource.Loading())
+        try {
+            catalogService.getMedicinesBy(medId = medId, catId = catId).map { list -> list.map { it.toMedicine() } }
+                .collect { modelList ->
+                    emit(Resource.Success(modelList))
+                }
+        }catch (e: Exception){
+            Log.e("GetMedicine By", "Error: ${e.message}", e)
+            emit(Resource.Error("Error"))
         }
     }
 

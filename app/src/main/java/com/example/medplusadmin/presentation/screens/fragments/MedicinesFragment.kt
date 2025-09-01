@@ -23,7 +23,7 @@ import com.example.medplusadmin.presentation.interfaces.MedicineInterface
 import com.example.medplusadmin.presentation.interfaces.medicineCLick
 import com.example.medplusadmin.presentation.viewModels.CatalogViewModel
 import com.example.medplusadmin.utils.Resource
-import com.example.medplusadmin.utils.collectFlowSafely
+import com.example.medplusadmin.utils.collectSafelyWithFlow
 import com.example.medplusadmin.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -89,33 +89,31 @@ class MedicinesFragment : Fragment() {
 
         })
 
-        collectFlowSafely(handler) {
-            catalogViewModel.filteredMedicines.collect { state ->
-                binding.loader.visibility = View.GONE
-                medicineList.clear()
-                when (state) {
-                    is Resource.Loading -> {
-                        binding.loader.visibility = View.VISIBLE
+        collectSafelyWithFlow(catalogViewModel.filteredMedicines, handler) { state ->
+            binding.loader.visibility = View.GONE
+            medicineList.clear()
+            when (state) {
+                is Resource.Loading -> {
+                    binding.loader.visibility = View.VISIBLE
+                }
+
+                is Resource.Success -> {
+                    binding.loader.visibility = View.GONE
+                    val data = state.data
+
+                    if (!data.isNullOrEmpty()) {
+                        medicineList.addAll(data)
+                        Log.d("MedicineFragment", "Fetched ${medicineList.size} categories.")
+                    } else {
+                        Log.e("MedicineFragment", "No categories found.")
                     }
 
-                    is Resource.Success -> {
-                        binding.loader.visibility = View.GONE
-                        val data = state.data
+                    medicineAdapter.notifyDataSetChanged()
+                }
 
-                        if (!data.isNullOrEmpty()) {
-                            medicineList.addAll(data)
-                            Log.d("MedicineFragment", "Fetched ${medicineList.size} categories.")
-                        } else {
-                            Log.e("MedicineFragment", "No categories found.")
-                        }
-
-                        medicineAdapter.notifyDataSetChanged()
-                    }
-
-                    is Resource.Error -> {
-                        binding.loader.visibility = View.GONE
-                        mainActivity.showToast(state.message ?: "Unknown Error")
-                    }
+                is Resource.Error -> {
+                    binding.loader.visibility = View.GONE
+                    mainActivity.showToast(state.message ?: "Unknown Error")
                 }
             }
         }
@@ -125,27 +123,33 @@ class MedicinesFragment : Fragment() {
                 when (onMedicineClickType) {
 
                     medicineCLick.delete -> {
+                        Log.e("onMedClick", "onMedDeleteClick: ${medicineList[position]}")
                         AlertDialog.Builder(mainActivity).apply {
                             setTitle("Are you sure?")
                             setPositiveButton("Delete") { _, _ ->
                                 lifecycleScope.launch(handler) {
-                                    val id = medicineList[position].medId
                                     val deletedItem = medicineList[position]
+                                    val id = deletedItem.medId
 
-                                    Log.d("DeleteMedicine", "Trying to delete position: $id, name: ${deletedItem.medicineName}")
+                                    if (id.isNullOrEmpty()) {
+                                        Log.e("DeleteMedicine", "Medicine ID is null or empty. Cannot delete ${deletedItem.medicineName}")
+                                        mainActivity.showToast("Cannot delete ${deletedItem.medicineName}: Invalid ID")
+                                        return@launch
+                                    }
 
+                                    Log.d("DeleteMedicine", "Trying to delete ID: $id, name: ${deletedItem.medicineName}")
                                     val result = catalogViewModel.deleteMedicine(id)
 
                                     if (result is Resource.Success) {
                                         Log.e("DeleteMedicine", "Successfully deleted: $deletedItem")
-
                                         mainActivity.showToast("${deletedItem.medicineName} deleted")
                                     } else if (result is Resource.Error) {
+                                        Log.e("DeleteMedicine", "Error deleting: ${result.message}")
                                         mainActivity.showToast("Failed to delete: ${result.message}")
-                                        Log.e("DeleteMedicine", "Error: ${result.message}")
                                     }
                                 }
                             }
+
                             setNegativeButton("Cancel", null)
                             setCancelable(true)
                             show()
@@ -156,6 +160,7 @@ class MedicinesFragment : Fragment() {
                         val bundle = Bundle().apply {
                             putString("medicineId", medicineList[position].medId)
                         }
+                        Log.e("editMedicine", "onMedClick: ${medicineList[position]}")
                         findNavController().navigate(
                             R.id.action_medicinesFragment_to_showSingleMedicineFragment,
                             bundle
@@ -166,6 +171,7 @@ class MedicinesFragment : Fragment() {
                         val bundle = Bundle().apply {
                             putString("medicineId", medicineList[position].medId)
                         }
+                        Log.e("editMedicine", "onUpdateClick: ${medicineList[position]}")
                         findNavController().navigate(
                             R.id.action_medicinesFragment_to_medicineDetailsFragment,
                             bundle

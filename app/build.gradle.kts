@@ -96,4 +96,5 @@ dependencies {
 // hilt
     implementation("com.google.dagger:hilt-android:2.56.1")
     ksp("com.google.dagger:hilt-android-compiler:2.56.1")
+    implementation("com.google.android.material:material:1.12.0")
 }

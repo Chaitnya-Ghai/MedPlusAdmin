@@ -15,5 +15,5 @@ interface CatalogRepository {
     suspend fun upsertMedicine(medicine: Medicine): Resource<Boolean>
     suspend fun deleteMedicine(id: String): Resource<Boolean>
 //  RELATIONAL QUERIES
-    suspend fun getMedicineBy(medId: String? = null, catId: String? = null): Resource<List<Medicine>>
+    fun getMedicineBy(medId: String? = null, catId: String? = null): Flow<Resource<List<Medicine>>>
 }

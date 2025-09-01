@@ -1,10 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.checkbox.MaterialCheckBox
+<com.google.android.material.chip.ChipGroup
+    android:id="@+id/chipGroup"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="@string/categories"
-    android:id="@+id/categorySelected"
-    android:textSize="@dimen/_8sp"
-    android:textAppearance="@style/CustomMedium"
     android:layout_margin="@dimen/_8sp"
-    xmlns:android="http://schemas.android.com/apk/res/android" />
+    app:singleSelection="false"
+    app:chipSpacing="8dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/categorySelected"
+        style="@style/Widget.Material3.Chip.Filter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:chipStartPadding="@dimen/_8sp"
+        app:chipEndPadding="@dimen/_8sp"
+        android:text="@string/hello_blank_fragment"
+        app:checkedIconVisible="false"
+        app:closeIconVisible="false" />
+
+
+</com.google.android.material.chip.ChipGroup>
+
