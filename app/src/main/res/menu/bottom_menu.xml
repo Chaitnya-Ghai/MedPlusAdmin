@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/category"
+        android:icon="@mipmap/ic_category"
+        android:title="@string/categories" />
+
+    <item
+        android:id="@+id/medicines"
+        android:icon="@mipmap/ic_medicines"
+        android:title="@string/medicines" />
+
+    <item
+        android:id="@+id/shopkeepers"
+        android:icon="@mipmap/ic_users"
+        android:title="@string/shopkeepers" />
+
+</menu>

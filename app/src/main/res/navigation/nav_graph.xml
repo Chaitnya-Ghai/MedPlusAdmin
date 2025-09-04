@@ -3,22 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph.xml"
-    app:startDestination="@id/manageUsersFragment">
-    <fragment
-        android:id="@+id/manageUsersFragment"
-        android:name="com.example.medplusadmin.presentation.screens.fragments.ManageUsersFragment"
-        android:label="Active Users"
-        tools:layout="@layout/fragment_manage_users" >
-        <action
-            android:id="@+id/action_manageUsersFragment2_to_categoriesFragment"
-            app:destination="@id/categoriesFragment" />
-        <action
-            android:id="@+id/action_manageUsersFragment2_to_medicinesFragment"
-            app:destination="@id/medicinesFragment" />
-        <action
-            android:id="@+id/action_manageUsersFragment2_to_dashboardFragment"
-            app:destination="@id/dashboardFragment" />
-    </fragment>
+    app:startDestination="@id/categoriesFragment">
+
     <fragment
         android:id="@+id/categoriesFragment"
         android:name="com.example.medplusadmin.presentation.screens.fragments.CategoriesFragment"
@@ -30,6 +16,9 @@
         <action
             android:id="@+id/action_categoriesFragment_to_filterMedicinesFragment"
             app:destination="@id/filterMedicinesFragment" />
+        <action
+            android:id="@+id/action_categoriesFragment_to_manageUsersFragment"
+            app:destination="@id/manageUsersFragment" />
     </fragment>
     <fragment
         android:id="@+id/medicinesFragment"
@@ -47,10 +36,10 @@
             app:destination="@id/showSingleMedicineFragment" />
     </fragment>
     <fragment
-        android:id="@+id/dashboardFragment"
-        android:name="com.example.medplusadmin.presentation.screens.fragments.DashboardFragment"
-        android:label="Dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/manageUsersFragment"
+        android:name="com.example.medplusadmin.presentation.screens.fragments.ManageUsersFragment"
+        android:label="Active Users"
+        tools:layout="@layout/fragment_manage_users" />
     <fragment
         android:id="@+id/medicineDetailsFragment"
         android:name="com.example.medplusadmin.presentation.screens.fragments.MedicineDetailsFragment"

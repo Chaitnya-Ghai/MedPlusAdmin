@@ -5,3 +5,9 @@ data class ProductDetail(
     var brandName: String?=null,
     var originalPrice: String?=null,
 )
+
+data class InventoryItem(
+    var medicineId: String = "",
+    var medicineName: String = "",
+    var shopMedicinePrice: String = "",
+)

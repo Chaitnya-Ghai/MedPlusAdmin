@@ -46,8 +46,7 @@ object AppModule {
     @Singleton
     fun provideProfileService(
         db: FirebaseFirestore,
-        supabaseClient: SupabaseClient
-    ): ProfileService = ProfileService(db, supabaseClient)
+    ): ProfileService = ProfileService(db)
 
 }
 

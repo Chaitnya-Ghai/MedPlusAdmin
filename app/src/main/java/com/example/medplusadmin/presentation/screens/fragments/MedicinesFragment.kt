@@ -182,8 +182,8 @@ class MedicinesFragment : Fragment() {
                 }
             }
         })
-        binding.MedicinesRv.adapter = medicineAdapter
-        binding.MedicinesRv.layoutManager = GridLayoutManager(mainActivity,2)
+        binding.medicinesRv.adapter = medicineAdapter
+        binding.medicinesRv.layoutManager = GridLayoutManager(mainActivity,2)
 
         binding.loader.visibility = View.VISIBLE
         binding.addMedicine.setOnClickListener {

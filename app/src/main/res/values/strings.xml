@@ -12,4 +12,7 @@
     <string name="home">Home</string>
     <string name="dashboard">Dashboard</string>
     <string name="support_help"><![CDATA[Support & Help]]></string>
+    <string name="add_medicine">Add Medicine</string>
+    <string name="add_category">Add Category</string>
+    <string name="shopkeepers">Shopkeepers</string>
 </resources>
