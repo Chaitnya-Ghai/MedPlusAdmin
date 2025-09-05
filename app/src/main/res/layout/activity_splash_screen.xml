@@ -1,56 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
-    android:background="#D6E2EA"
+    android:orientation="vertical"
+    android:background="@mipmap/splash_screen_1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".presentation.screens.activities.SplashScreen">
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/g_h_80"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.82" />
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/g_h_89"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.89" />
-    <ImageView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:src="@drawable/splash"
-        android:fitsSystemWindows="true"
-        android:scaleType="centerInside"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/text"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-    <TextView
-        android:id="@+id/text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        style="@style/CustomHighBold"
-        android:layout_marginTop="-30dp"
-        android:textSize="40sp"
-        android:text="@string/app_name"
-        app:layout_constraintTop_toTopOf="@id/g_h_80"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        style="@style/CustomLight"
-        android:layout_marginTop="-30dp"
-        android:textSize="10sp"
-        android:text="Designed by Chaitnya Ghai"
-        app:layout_constraintTop_toBottomOf="@id/g_h_89"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

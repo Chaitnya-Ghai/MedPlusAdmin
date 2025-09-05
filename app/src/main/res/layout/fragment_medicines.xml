@@ -27,7 +27,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/_20sp"
-        android:layout_marginTop="@dimen/_10sp"
+        android:layout_marginTop="@dimen/_10dp"
         android:background="@drawable/search_bg"
         android:iconifiedByDefault="false"
         android:inputType="textCapWords"
