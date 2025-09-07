@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="64dp"
+    android:layout_height="98dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="70dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="#08090F47"
+    android:backgroundTint="@color/white"
+    android:layout_marginEnd="@dimen/_10dp"
+    app:cardElevation="0dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+        <androidx.cardview.widget.CardView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:cardCornerRadius="@dimen/_100sp"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="7dp">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/categories"
+                android:src="@mipmap/ellipse"/>
+
+        </androidx.cardview.widget.CardView>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/medicines"
+            android:layout_marginTop="8dp"
+            android:textSize="11sp"
+            android:gravity="center"
+            android:textColor="#090F47"
+            android:alpha=".95"
+            />
+        
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
