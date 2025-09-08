@@ -3,6 +3,7 @@ package com.example.medplusadmin.di
 import com.example.medplusadmin.BuildConfig
 import com.example.medplusadmin.data.remote.firebaseServices.CatalogService
 import com.example.medplusadmin.data.remote.firebaseServices.ProfileService
+import com.example.medplusadmin.data.remote.supabase.SupabaseServices
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -42,6 +43,13 @@ object AppModule {
         supabaseClient: SupabaseClient
     ): CatalogService = CatalogService(db, supabaseClient)
 
+    @Provides
+    @Singleton
+    fun provideSupabaseService(
+        supabaseClient: SupabaseClient
+    ): SupabaseServices {
+        return SupabaseServices(supabaseClient)
+    }
     @Provides
     @Singleton
     fun provideProfileService(
