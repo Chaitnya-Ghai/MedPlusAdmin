@@ -1,9 +1,9 @@
 package com.example.medplusadmin.domain.repository
 
-import android.net.Uri
-import com.example.medplusadmin.utils.Resource
+import com.example.medplusadmin.utils.ImageUploadState
+import com.example.medplusadmin.utils.UploadType
+import kotlinx.coroutines.flow.Flow
 
 interface SupabaseRepository {
-    suspend fun uploadImageToSupabase(uri: Uri): Resource<String> // returns URL
-    suspend fun deleteImageFromSupabase(url: String): Resource<Unit>
+    fun uploadImageToSupabase(byteArray: ByteArray , type: UploadType,position: Int): Flow<ImageUploadState>
 }

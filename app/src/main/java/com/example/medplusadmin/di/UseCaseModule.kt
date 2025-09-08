@@ -1,6 +1,7 @@
 package com.example.medplusadmin.di
 
 import com.example.medplusadmin.domain.repository.CatalogRepository
+import com.example.medplusadmin.domain.repository.SupabaseRepository
 import com.example.medplusadmin.domain.usecases.catalog.DeleteCategoryUseCase
 import com.example.medplusadmin.domain.usecases.catalog.DeleteMedicineUseCase
 import com.example.medplusadmin.domain.usecases.catalog.GetAllCategoriesUseCase
@@ -9,6 +10,7 @@ import com.example.medplusadmin.domain.usecases.catalog.GetMedicinesByCategoryUs
 import com.example.medplusadmin.domain.usecases.catalog.GetaMedicineByIdUseCase
 import com.example.medplusadmin.domain.usecases.catalog.UpsertCategoriesUseCase
 import com.example.medplusadmin.domain.usecases.catalog.UpsertMedicinesUseCse
+import com.example.medplusadmin.domain.usecases.supabase.UploadImageUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -81,6 +83,15 @@ object UseCaseModule {
         catalogRepository: CatalogRepository
     ) : GetaMedicineByIdUseCase {
         return GetaMedicineByIdUseCase(catalogRepository)
+    }
+
+
+    @Provides
+    @ViewModelScoped
+    fun provideUploadImageUseCase(
+        supabaseRepository: SupabaseRepository
+    ): UploadImageUseCase {
+        return UploadImageUseCase(supabaseRepository)
     }
 
 

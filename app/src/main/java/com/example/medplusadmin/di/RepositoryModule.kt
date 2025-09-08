@@ -2,8 +2,10 @@ package com.example.medplusadmin.di
 
 import com.example.medplusadmin.data.repository.CatalogRepositoryImpl
 import com.example.medplusadmin.data.repository.ProfileRepositoryImpl
+import com.example.medplusadmin.data.repository.SupabaseRepositoryImpl
 import com.example.medplusadmin.domain.repository.CatalogRepository
 import com.example.medplusadmin.domain.repository.ProfileRepository
+import com.example.medplusadmin.domain.repository.SupabaseRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -26,5 +28,11 @@ abstract class RepositoryModule {
     abstract fun bindProfileRepository(
         impl: ProfileRepositoryImpl
     ): ProfileRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSupabaseRepository(
+        impl: SupabaseRepositoryImpl
+    ): SupabaseRepository
 
 }

@@ -1,5 +1,6 @@
 package com.example.medplusadmin.presentation.viewModels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.medplusadmin.domain.models.Category
@@ -12,8 +13,11 @@ import com.example.medplusadmin.domain.usecases.catalog.GetMedicinesByCategoryUs
 import com.example.medplusadmin.domain.usecases.catalog.GetaMedicineByIdUseCase
 import com.example.medplusadmin.domain.usecases.catalog.UpsertCategoriesUseCase
 import com.example.medplusadmin.domain.usecases.catalog.UpsertMedicinesUseCse
+import com.example.medplusadmin.domain.usecases.supabase.UploadImageUseCase
 import com.example.medplusadmin.utils.CatalogUIEvent
+import com.example.medplusadmin.utils.ImageUploadState
 import com.example.medplusadmin.utils.Resource
+import com.example.medplusadmin.utils.UploadType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -40,6 +44,7 @@ class CatalogViewModel @Inject constructor(
     private val getMedicineByIdUseCase: GetaMedicineByIdUseCase,
     private val getMedicinesByCategory: GetMedicinesByCategoryUseCase,
     private val upsertMedicinesUseCse: UpsertMedicinesUseCse,
+    private val uploadImageUseCase: UploadImageUseCase
 
 ) : ViewModel() {
 
@@ -139,11 +144,41 @@ class CatalogViewModel @Inject constructor(
         }
     }
 
-
-
-
-
     // ------------------- SUPABASE IMAGE UPLOAD -------------------
+
+    private val _uploadStateCategory = MutableStateFlow<ImageUploadState>(ImageUploadState.Idle)
+    val uploadStateCategory: StateFlow<ImageUploadState> = _uploadStateCategory
+
+    private val _uploadStateMedicine = MutableStateFlow<ImageUploadState>(ImageUploadState.Idle)
+    val uploadStateMedicine: StateFlow<ImageUploadState> = _uploadStateMedicine
+
+    fun uploadImageToSupabase(byteArray: ByteArray, type: UploadType, position: Int) {
+        Log.e("supabase", "uploadImageToSupabase: ", )
+        viewModelScope.launch(Dispatchers.IO) {
+            _uploadStateCategory.value = ImageUploadState.Loading
+            try {
+                uploadImageUseCase.invoke(byteArray = byteArray, type=type , position = position).collect { state ->
+                    when (state) {
+                        is ImageUploadState.Success -> {
+                            // Emit position along with imageUrl
+                            Log.e("supabase", "res in Vm : ${state.imageUrl}", )
+                            _uploadStateCategory.value = ImageUploadState.Success(state.imageUrl, position)
+
+                            // Reset to Idle after handling
+                            _uploadStateCategory.value = ImageUploadState.Idle
+                        }
+                        is ImageUploadState.Error -> {
+                            _uploadStateCategory.value = state
+                        }
+                        else -> Unit
+                    }
+                }
+            } catch (e: Exception) {
+                _uploadStateCategory.value = ImageUploadState.Error("Upload failed: ${e.message}")
+            }
+        }
+    }
+
 
     // private val _uploadState = MutableStateFlow<Resource<String>>(Resource.Loading())
     // val uploadState: StateFlow<Resource<String>> = _uploadState
