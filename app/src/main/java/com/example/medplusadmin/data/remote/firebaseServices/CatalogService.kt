@@ -1,6 +1,7 @@
 package com.example.medplusadmin.data.remote.firebaseServices
 
 import android.util.Log
+import com.example.medplusadmin.data.mappers.toDto
 import com.example.medplusadmin.data.remote.dto.CategoryDto
 import com.example.medplusadmin.data.remote.dto.MedicineDto
 import com.example.medplusadmin.domain.models.Category
@@ -49,22 +50,33 @@ class CatalogService @Inject constructor(
      */
     suspend fun upsertCategory(category: Category): Boolean {
         return try {
+            // Convert Category to CategoryDto for Firebase
+            val categoryDto = category.toDto()
+            
             if (category.id.isEmpty()) {
+                // Check if category with same name already exists
                 val existing = db.collection(CATEGORY)
                     .whereEqualTo("categoryName", category.categoryName)
                     .get()
                     .await()
-                if (!existing.isEmpty) return false
+                if (!existing.isEmpty) {
+                    Log.e("upsertCategory", "Category with name '${category.categoryName}' already exists")
+                    return false
+                }
 
+                // Create new category document
                 val docRef = db.collection(CATEGORY).document()
-                val finalCategory = category.copy(id = docRef.id)
-                docRef.set(finalCategory).await()
+                val finalCategoryDto = categoryDto.copy(id = docRef.id)
+                docRef.set(finalCategoryDto).await()
+                Log.d("upsertCategory", "Category added to Firebase: ${finalCategoryDto.categoryName} with id: ${docRef.id}")
             } else {
-                db.collection(CATEGORY).document(category.id).set(category).await()
+                // Update existing category
+                db.collection(CATEGORY).document(category.id).set(categoryDto).await()
+                Log.d("upsertCategory", "Category updated in Firebase: ${category.categoryName} with id: ${category.id}")
             }
             true
         } catch (e: Exception) {
-            Log.e("upsertCategory", "FirebaseService error = ${e.message}")
+            Log.e("upsertCategory", "FirebaseService error = ${e.message}", e)
             false
         }
     }

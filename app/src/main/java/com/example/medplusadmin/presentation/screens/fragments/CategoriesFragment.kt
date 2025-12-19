@@ -21,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
+import com.example.medplusadmin.bucketId
 import com.example.medplusadmin.presentation.screens.activities.MainActivity
 import com.example.medplusadmin.R
 import com.example.medplusadmin.presentation.adapters.CategoryAdapter
@@ -69,10 +70,14 @@ class CategoriesFragment: Fragment() {
     private lateinit var publicUrl:String
     private var imageSource: String? = null
     private var categoryPairsList = mutableListOf<Pair<String,String>>()
+    private var currentDialog: Dialog? = null
     //        CoroutineExceptionHandler
     val handler = CoroutineExceptionHandler { _, exception ->
         Log.e("DeleteCategory", "Coroutine error: ${exception.localizedMessage}")
-        showToast("Something went wrong: ${exception.localizedMessage}")
+        // Use Handler to post toast on main thread
+        android.os.Handler(android.os.Looper.getMainLooper()).post {
+            mainActivity.showToast("Something went wrong: ${exception.localizedMessage}")
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -199,8 +204,8 @@ class CategoriesFragment: Fragment() {
         }
         //   add category
         lifecycleScope.launch(handler) {
-            catalogViewModel.upsertCategoryState.collect {
-                when (it) {
+            catalogViewModel.upsertCategoryState.collect { state ->
+                when (state) {
                     is Resource.Loading -> {
                         binding.loader.visibility = View.VISIBLE
                         customDialogBinding.saveBtn.isClickable = false
@@ -209,12 +214,27 @@ class CategoriesFragment: Fragment() {
                     is Resource.Success -> {
                         binding.loader.visibility = View.GONE
                         customDialogBinding.saveBtn.isClickable = true
-
+                        customDialogBinding.saveBtn.visibility = View.VISIBLE
+                        // Show success message
+                        mainActivity.showToast("Category saved successfully to Firebase")
+                        Log.d("CategoryFragment", "Category saved successfully to Firebase")
+                        // Dismiss dialog after successful save
+                        currentDialog?.dismiss()
+                        currentDialog = null
+                        // Reset image source
+                        imageSource = null
+                        // Note: RecyclerView will auto-update via getCategoriesFlow() snapshot listener
                     }
 
                     is Resource.Error -> {
                         binding.loader.visibility = View.GONE
                         customDialogBinding.saveBtn.isClickable = true
+                        customDialogBinding.saveBtn.visibility = View.VISIBLE
+                        // Show error message
+                        val errorMsg = state.message ?: "Failed to save category to Firebase"
+                        mainActivity.showToast(errorMsg)
+                        Log.e("CategoryFragment", "Error saving category: $errorMsg")
+                        // Keep dialog open so user can retry
                     }
                 }
             }
@@ -234,7 +254,7 @@ class CategoriesFragment: Fragment() {
     private fun openDialog(position:Int = -1){
         Log.e("open dialog", "onClick: $position " )
         customDialogBinding= CustomDialogBinding.inflate(layoutInflater)
-        val dialog = Dialog(mainActivity).apply {
+        currentDialog = Dialog(mainActivity).apply {
             setContentView(customDialogBinding.root)
             setCancelable(false)
             window?.setLayout(
@@ -243,7 +263,10 @@ class CategoriesFragment: Fragment() {
             )
             show()
         }
-        customDialogBinding.cancelBtn.setOnClickListener { dialog.dismiss() }
+        customDialogBinding.cancelBtn.setOnClickListener { 
+            currentDialog?.dismiss()
+            currentDialog = null
+        }
 //      select image from gallery
         customDialogBinding.imgDialog.setOnClickListener {
             if (mainActivity.arePermissionsGranted()){ catalogViewModel.onCategoryImageClick() }
@@ -271,10 +294,10 @@ class CategoriesFragment: Fragment() {
                     if (imageSource!!.startsWith("http")) {
                         Log.e("img not updated ", "Image is in from a URL: $imageSource")
                         storeDataToFireStore(url = imageSource!!, position)
-                        dialog.dismiss()
+                        // Don't dismiss dialog here - wait for success/error
                     } else {
                         uploadImageToSupabase(imgUri,position)
-                        dialog.dismiss()
+                        // Don't dismiss dialog here - wait for success/error
                     }
                 }
         }
@@ -283,20 +306,32 @@ class CategoriesFragment: Fragment() {
     private fun storeDataToFireStore(url: String, position: Int) {
         binding.loader.visibility=View.VISIBLE
         customDialogBinding.saveBtn.visibility=View.GONE
+        
+        val categoryName = customDialogBinding.name.text.toString().trim()
+        if (categoryName.isBlank()) {
+            binding.loader.visibility = View.GONE
+            customDialogBinding.saveBtn.visibility = View.VISIBLE
+            customDialogBinding.name.error = "Enter Category Name"
+            return
+        }
+        
         val data = if (position > -1) {
+            // Update existing category
             Category(
                 id = categoryArray[position].id,
-                categoryName = customDialogBinding.name.text.toString().lowercase(Locale.ROOT),
+                categoryName = categoryName.lowercase(Locale.ROOT),
                 imageUrl = url
             )
         } else {
+            // Create new category
             Category(
-                id = "", // will be set in repo
-                categoryName = customDialogBinding.name.text.toString().lowercase(Locale.ROOT),
+                id = "", // will be set in Firebase
+                categoryName = categoryName.lowercase(Locale.ROOT),
                 imageUrl = url
             )
         }
 
+        Log.d("CategoryFragment", "Saving category to Firebase: ${data.categoryName}")
         lifecycleScope.launch(handler) {
             catalogViewModel.upsertCategories(data)
         }
@@ -304,7 +339,7 @@ class CategoriesFragment: Fragment() {
     private fun uploadImageToSupabase(uri: Uri,position: Int){
         val byteArr = uriToByteArray(mainActivity,uri)
         val fileName ="categories/${System.currentTimeMillis()}.jpg"
-        val bucket = supabaseClient.storage.from("MedPlus Admin")
+        val bucket = supabaseClient.storage.from(bucketId)
         lifecycleScope.launch(handler + Dispatchers.IO) {
             try {
                 bucket.uploadAsFlow(fileName,byteArr).collect{
@@ -332,7 +367,9 @@ class CategoriesFragment: Fragment() {
                 }
             }
             catch (e:Exception){
-                Toast.makeText(mainActivity, "upload to supabase Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                withContext(Dispatchers.Main) {
+                    mainActivity.showToast("upload to supabase Error: ${e.message}")
+                }
             }
         }
     }

@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings
+import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -21,11 +22,13 @@ import com.example.medplusadmin.R
 import com.example.medplusadmin.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.core.net.toUri
+import androidx.core.view.WindowCompat
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private lateinit var navController: NavController
+    private var shouldShowBottomNav = true
 
     private val PERMISSION_REQUEST_CODE = 100
 
@@ -33,11 +36,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+
+        setupWindowInsets()
         navController = findNavController(R.id.host)
         binding.bottomNavView.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -62,7 +62,44 @@ class MainActivity : AppCompatActivity() {
         }
         checkAndRequirePermission()
     }
+    private fun setupWindowInsets() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(
+                systemBarsInsets.left,
+                systemBarsInsets.top,
+                systemBarsInsets.right,
+                systemBarsInsets.bottom
+            )
+
+            // Handle keyboard visibility for bottom navigation
+            val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+            updateBottomNavVisibility(imeVisible)
+
+            insets
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.bottomNavView) { view, insets ->
+            view.setPadding(
+                view.paddingLeft,
+                view.paddingTop,
+                view.paddingRight,
+                16
+            )
+            insets
+        }
+    }
+    private fun updateBottomNavVisibility(keyboardVisible: Boolean) {
+        // Hide bottom nav when keyboard is visible, show when hidden (if it should be visible)
+        if (keyboardVisible) {
+            binding.bottomNavView.visibility = View.GONE
+        } else {
+            // Only show if it should be visible based on navigation state
+            binding.bottomNavView.visibility = if (shouldShowBottomNav) View.VISIBLE else View.GONE
+        }
+    }
 
     private fun handleDarkMode(){
         /* IMPLEMENT KRNA HAI*/

@@ -18,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
+import com.example.medplusadmin.bucketId
 import com.example.medplusadmin.presentation.screens.activities.MainActivity
 import com.example.medplusadmin.R
 import com.example.medplusadmin.presentation.adapters.ShowCategoryAdapter
@@ -254,7 +255,7 @@ class MedicineDetailsFragment : Fragment() {
     private fun uploadImageToSupabase(uri: Uri) {
         val byteArr = uriToByteArray(mainActivity, uri)
         val fileName = "medicines/${System.currentTimeMillis()}.jpg"
-        val bucket = supabaseClient.storage.from("MedPlus Admin")
+        val bucket = supabaseClient.storage.from(bucketId)
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {

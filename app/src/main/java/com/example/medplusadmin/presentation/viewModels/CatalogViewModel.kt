@@ -21,6 +21,7 @@ import com.example.medplusadmin.utils.UploadType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -165,6 +166,7 @@ class CatalogViewModel @Inject constructor(
                             _uploadStateCategory.value = ImageUploadState.Success(state.imageUrl, position)
 
                             // Reset to Idle after handling
+                            delay(300)
                             _uploadStateCategory.value = ImageUploadState.Idle
                         }
                         is ImageUploadState.Error -> {

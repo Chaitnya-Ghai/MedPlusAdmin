@@ -2,14 +2,18 @@ package com.example.medplusadmin.utils
 
 import android.content.Context
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Collects a flow safely within the Fragment's lifecycle.
@@ -44,9 +48,17 @@ fun Fragment.showToast(message: String) {
     context?.showToast(message)
 }
 
-/*Show a Toast from any Context.*/
+/*Show a Toast from any Context. Ensures it runs on the main thread.*/
 fun Context.showToast(message: String) {
-    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    if (Looper.myLooper() == Looper.getMainLooper()) {
+        // Already on main thread
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    } else {
+        // Switch to main thread
+        Handler(Looper.getMainLooper()).post {
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        }
+    }
 }
 
 /*Convert a content URI to a ByteArray safely.*/
